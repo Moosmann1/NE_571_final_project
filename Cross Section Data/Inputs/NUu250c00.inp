@@ -44,12 +44,13 @@ PIN 3   0.434  0.438  0.485  0.573   0.613  /
 SPA 14.574,,, 8.14 / 718=79.55  347=20.45  * SPACER 
 ****************************************************
 
-
+* Provides limits of average burnup at 35000 MWd/t
+* https://www.ans.org/news/article-4013/nuscale-responds-to-smr-critique/;/
 *
-DEP ,  -60.00
+DEP ,  -35.00
 *
 AVE 'CELL' / 0 1 0 0 0 0  * FOR TWO GROUP CROSS SECTIONS
 *
-COE ,, -60.00
+COE ,, -35.00
 
 END
