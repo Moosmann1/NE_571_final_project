@@ -18,6 +18,7 @@ def assembly_maker(assembly_num, dep, bor):
 
     return assembly
 
+
 def core_maker(core_map):
     core = np.empty([90,90,20], dtype=object)
     
