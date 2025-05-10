@@ -358,22 +358,22 @@ def fluxsearch(A1, A2, B1f, B1t, B2):
     return k, flux1, flux2
 
 
-# === Load the core map from config file ===
+# # === Load the core map from config file ===
 core_test = CoreBuilder.core_maker("core_map2")
 
-# === Define core geometry dimensions ===
-assembly_ij_dim = 10   # cm (length of one assembly side in X/Y)
-fuel_k_dim = 200       # cm (height of fuel region)
-bottom_ref_k_dim = 10  # cm (height of bottom reflector)
-top_ref_k_dim = 10     # cm (height of top reflector)
+# # === Define core geometry dimensions ===
+# assembly_ij_dim = 10   # cm (length of one assembly side in X/Y)
+# fuel_k_dim = 200       # cm (height of fuel region)
+# bottom_ref_k_dim = 10  # cm (height of bottom reflector)
+# top_ref_k_dim = 10     # cm (height of top reflector)
 
-# === Build matrices and solve for flux and k-effective ===
-A1, A2, B1_fast_fission, B1_thermal_fission, B2 = matrix(
-    core_test, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim
-)
+# # === Build matrices and solve for flux and k-effective ===
+# A1, A2, B1_fast_fission, B1_thermal_fission, B2 = matrix(
+#     core_test, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim
+# )
 
-k_1, flux1_1, flux2_1 = fluxsearch(A1, A2, B1_fast_fission, B1_thermal_fission, B2)
-print(f"Final k-effective: {k_1:.6f}")
+# k_1, flux1_1, flux2_1 = fluxsearch(A1, A2, B1_fast_fission, B1_thermal_fission, B2)
+# print(f"Final k-effective: {k_1:.6f}")
 
 # === Normalize flux and plot power/flux maps ===
 def normalize_and_plot(flux1, flux2, core_map, power_MW, assembly_dim_cm, fuel_height_cm):
@@ -420,7 +420,7 @@ def normalize_and_plot(flux1, flux2, core_map, power_MW, assembly_dim_cm, fuel_h
 
                         fission_source.append((flux1[flat_idx] * sigf1 + flux2[flat_idx] * sigf2) * node_vol_cm3)
 
-            avg_flux = (local_flux1 + local_flux2) / (10 * 10 * 10)
+            avg_flux = (local_flux1 + local_flux2) / (10 * 10 * 10) #possibly change to 10 * 10 so as to get the ij average over sum of k fluxes
             row_flux.append(avg_flux)
             row_power.append(local_power)
         flux_map.append(row_flux)
@@ -430,6 +430,7 @@ def normalize_and_plot(flux1, flux2, core_map, power_MW, assembly_dim_cm, fuel_h
     total_power_W = power_MW * 1e6
     raw_total_power = np.sum(power_map)
     norm_factor = total_power_W / raw_total_power
+    flux_map = (np.array(flux_map) * norm_factor).tolist()
     power_map = (np.array(power_map) * norm_factor).tolist()
 
     # === Plot Flux Map ===
@@ -478,6 +479,14 @@ def normalize_and_plot(flux1, flux2, core_map, power_MW, assembly_dim_cm, fuel_h
     plt.show()
    
 # === Run plot routine ===
+
+with open("flux1_1.txt", 'r') as flux1_file:
+    lines = flux1_file.readlines()
+    flux1_1 = np.array([float(line.strip()) for line in lines])
+with open("flux2_1.txt", 'r') as flux2_file:
+    lines = flux2_file.readlines()
+    flux2_1 = np.array([float(line.strip()) for line in lines])
+
 normalize_and_plot(
     flux1_1, flux2_1, core_test,
     power_MW=100,               # reactor thermal power
