@@ -373,14 +373,6 @@ A1, A2, B1_fast_fission, B1_thermal_fission, B2 = matrix(
 )
 
 k_1, flux1_1, flux2_1 = fluxsearch(A1, A2, B1_fast_fission, B1_thermal_fission, B2)
-
-with open("flux1_1.txt", "w") as f:
-    for i in range(len(flux1_1)):
-        f.write(f"{flux1_1[i]}\n")
-with open("flux2_1.txt", "w") as f:
-    for i in range(len(flux2_1)):
-        f.write(f"{flux2_1[i]}\n")
-
 print(f"Final k-effective: {k_1:.6f}")
 
 # === Normalize flux and plot power/flux maps ===
@@ -460,6 +452,31 @@ def normalize_and_plot(flux1, flux2, core_map, power_MW, assembly_dim_cm, fuel_h
     plt.tight_layout()
     plt.show()
 
+    # === 1D Line Plots Along Middle Row ===
+    middle_row_flux = flux_map[4]  # middle row (Y = 4)
+    middle_row_power = power_map[4]
+    x = list(range(len(middle_row_flux)))  # X assembly indices
+
+    # Line plot for flux
+    plt.figure()
+    plt.plot(x, middle_row_flux, marker='o')
+    plt.title("Flux Along Middle Row (Y = 4)")
+    plt.xlabel("X Assembly Index")
+    plt.ylabel("Flux")
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+    # Line plot for power
+    plt.figure()
+    plt.plot(x, middle_row_power, marker='o', color='r')
+    plt.title("Power Along Middle Row (Y = 4)")
+    plt.xlabel("X Assembly Index")
+    plt.ylabel("Power (W)")
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+   
 # === Run plot routine ===
 normalize_and_plot(
     flux1_1, flux2_1, core_test,
