@@ -1,15 +1,15 @@
 import pandas as pd
 
 class CrossSectionVocabulary:
-    def __init__(self, excel_file):
-        # Load Excel file directly
-        self.df = pd.read_excel(excel_file)
+    def __init__(self, csv_file):
+        # Load CSV file directly
+        self.df = pd.read_csv(csv_file)
 
         # Build vocabulary as dictionary on the fly
         self.vocab = {}
         for _, row in self.df.iterrows():
-            # Include 'ASSEMBLY' as part of the key
-            key = (row["BURNUP"], row["TF"], row["TM"], row["BOR"], row["GROUP"], row["ASSEMBLY"])
+            # Include only 'BURNUP', 'TF', 'TM', 'BOR', 'GROUP' as part of the key (no 'ASSEMBLY')
+            key = (row["BURNUP"], row["TF"], row["TM"], row["BOR"], row["GROUP"])
             xs_data = {
                 "ABSORPTION": row["ABSORPTION"],
                 "CAPTURE": row["CAPTURE"],
@@ -21,25 +21,24 @@ class CrossSectionVocabulary:
             }
             self.vocab[key] = xs_data
 
-    def get(self, burnup, tf, tm, bor, group, assembly):
-        key = (burnup, tf, tm, bor, group, assembly)
+    def get(self, burnup, tf, tm, bor, group):
+        key = (burnup, tf, tm, bor, group)
         if key in self.vocab:
             return self.vocab[key]
         else:
-            raise KeyError(f"No cross section data found for: BURNUP={burnup}, TF={tf}, TM={tm}, BOR={bor}, GROUP={group}, ASSEMBLY={assembly}")
+            raise KeyError(f"No cross section data found for: BURNUP={burnup}, TF={tf}, TM={tm}, BOR={bor}, GROUP={group}")
 
     def list_keys(self):
         return list(self.vocab.keys())
 
 # Function to handle both exact match and interpolation
-def get_or_interpolate_cross_section(vocab, burnup, tf, tm, bor, group, assembly):
-    # Filter the data for the fixed parameters (burnup, tf, tm, group, assembly)
+def get_or_interpolate_cross_section(vocab, burnup, tf, tm, bor, group):
+    # Filter the data for the fixed parameters (burnup, tf, tm, group)
     filtered_df = vocab.df[
         (vocab.df['BURNUP'] == burnup) &
         (vocab.df['TF'] == tf) &
         (vocab.df['TM'] == tm) &
-        (vocab.df['GROUP'] == group) &
-        (vocab.df['ASSEMBLY'] == assembly)
+        (vocab.df['GROUP'] == group)
     ]
     
     # Check if the exact BOR value exists
@@ -76,15 +75,14 @@ burnup = 0           # Define BURNUP externally
 tf = 1019.3          # Define TF externally
 tm = 557.0           # Define TM externally
 group = 1            # Define GROUP externally
-assembly = 1         # Define ASSEMBLY externally
-test_bor = 1   # Define BOR value externally
+test_bor = 0        # Define BOR value externally
 
-vocab = CrossSectionVocabulary("XS_final.xlsx")
+vocab = CrossSectionVocabulary("XS260.csv")  # Load data from the correct CSV file
 
-# Get or interpolate the data for BOR=100 with the external parameters
-interpolated_bor_100 = get_or_interpolate_cross_section(vocab, burnup=burnup, tf=tf, tm=tm, bor=test_bor, group=group, assembly=assembly)
+# Get or interpolate the data for BOR=1 with the external parameters
+interpolated_bor_1 = get_or_interpolate_cross_section(vocab, burnup=burnup, tf=tf, tm=tm, bor=test_bor, group=group)
 
 # Print interpolated data
 print("Interpolated Data for BOR=1:")
-for k, v in interpolated_bor_100.items():
+for k, v in interpolated_bor_1.items():
     print(f"{k}: {v}")
