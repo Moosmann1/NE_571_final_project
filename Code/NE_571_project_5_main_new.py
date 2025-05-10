@@ -373,6 +373,14 @@ A1, A2, B1_fast_fission, B1_thermal_fission, B2 = matrix(
 )
 
 k_1, flux1_1, flux2_1 = fluxsearch(A1, A2, B1_fast_fission, B1_thermal_fission, B2)
+
+with open("flux1_1.txt", "w") as f:
+    for i in range(len(flux1_1)):
+        f.write(f"{flux1_1[i]}\n")
+with open("flux2_1.txt", "w") as f:
+    for i in range(len(flux2_1)):
+        f.write(f"{flux2_1[i]}\n")
+
 print(f"Final k-effective: {k_1:.6f}")
 
 # === Normalize flux and plot power/flux maps ===
