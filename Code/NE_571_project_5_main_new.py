@@ -5,7 +5,7 @@ from scipy.linalg import lu_factor, lu_solve
 from scipy.sparse import diags, csr_matrix
 from scipy.sparse.linalg import splu
 from core_builder import CoreBuilder
-from extract import CrossSectionVocabulary
+from extract_interpolate import CrossSectionVocabulary
 
 # Generates the matrixes for the flux search. 
 def matrix(core_map, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim):
@@ -39,8 +39,7 @@ def matrix(core_map, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_di
     # Calculate step sizes in the i and j directions (uniform for all regions)
     di_core = (9*assembly_ij_dim) / i_node_total
     dj_core = (9*assembly_ij_dim) / j_node_total
-    print(di_core)
-    print(dj_core)
+
     # Count nodes in the k direction for each region
     k_nodes_bottom_ref = 0
     k_nodes_fuel = 0
@@ -58,10 +57,6 @@ def matrix(core_map, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_di
     dk_bottom_ref = bottom_ref_k_dim / k_nodes_bottom_ref if k_nodes_bottom_ref > 0 else 0
     dk_fuel = fuel_k_dim / k_nodes_fuel if k_nodes_fuel > 0 else 0
     dk_top_ref = top_ref_k_dim / k_nodes_top_ref if k_nodes_top_ref > 0 else 0
-
-    print(dk_bottom_ref)
-    print(dk_fuel)
-    print(dk_top_ref)
     
     # A matrixes: the 1-D arrays that will get diagonalized
     central_fast = np.zeros(i_node_total*j_node_total*k_node_total)
@@ -456,7 +451,7 @@ def normalize_and_plot(flux1, flux2, core_map, power_MW, assembly_dim_cm, fuel_h
 grand_xs_library = {
     "NUu260c00": CrossSectionVocabulary("../Cross Section Data/XS_excel/XS260.csv"),
     "NUu405c00": CrossSectionVocabulary("../Cross Section Data/XS_excel/XS405.csv"),
-    "NUu450c50": CrossSectionVocabulary("../Cross Section Data/XS_excel/XS450.csv"),
+    "NUu455c50": CrossSectionVocabulary("../Cross Section Data/XS_excel/XS455.csv"),
     "rad":       CrossSectionVocabulary("../Cross Section Data/XS_excel/radref.csv"),
     "BOTREF":    CrossSectionVocabulary("../Cross Section Data/XS_excel/botref.csv"),
     "TOPREF":    CrossSectionVocabulary("../Cross Section Data/XS_excel/topref.csv"),
@@ -470,6 +465,7 @@ assembly_ij_dim = 21.5   # cm (length of one assembly side in X/Y)(8.466 in) htt
 fuel_k_dim = 200       # cm (height of fuel region) (78.74 in) https://www.nrc.gov/docs/ML2022/ML20224A492.pdf
 bottom_ref_k_dim = 10.16  # cm (height of bottom reflector) (4.00 in) https://www.nrc.gov/docs/ML2022/ML20224A492.pdf
 top_ref_k_dim = 9.02     # cm (height of top reflector) (3.551 in) https://www.nrc.gov/docs/ML2022/ML20224A492.pdf
+thermal_power = 160      # MWt https://www.nrc.gov/docs/ML2022/ML20224A492.pdf
 
 # # === Build matrices and solve for flux and k-effective ===
 # A1, A2, B1_fast_fission, B1_thermal_fission, B2 = matrix(
@@ -502,7 +498,7 @@ top_ref_k_dim = 9.02     # cm (height of top reflector) (3.551 in) https://www.n
 #     fuel_height_cm=200          # axial height of fuel
 # )
 
-core_checker = CoreBuilder.core_maker("core_map_checker") # checkered 4.05 and 4.50
+core_checker = CoreBuilder.core_maker("core_map_checker") # checkered 4.05 and 4.55
 
 A1_checker, A2_checker, B1_fast_fission_checker, B1_thermal_fission_checker, B2_checker = matrix(
     core_checker, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim
@@ -529,8 +525,39 @@ with open("flux2_checker.txt", 'r') as flux2_file:
 
 normalize_and_plot(
     flux1_checker, flux2_checker, core_checker,
-    power_MW=100,               # reactor thermal power
+    power_MW=thermal_power,               # reactor thermal power
     assembly_dim_cm=assembly_ij_dim,         # XY dimension per assembly
     fuel_height_cm=fuel_k_dim          # axial height of fuel
 )
 
+core_NuScale_eq = CoreBuilder.core_maker("core_map_NuScale_eq") # checkered 4.05 and 4.55
+
+A1_NuScale_eq, A2_NuScale_eq, B1_fast_fission_NuScale_eq, B1_thermal_fission_NuScale_eq, B2_NuScale_eq = matrix(
+    core_NuScale_eq, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim
+)
+
+k_NuScale_eq, flux1_NuScale_eq, flux2_NuScale_eq = fluxsearch(
+    A1_NuScale_eq, A2_NuScale_eq, B1_fast_fission_NuScale_eq, B1_thermal_fission_NuScale_eq, B2_NuScale_eq
+)
+print(f"Final k-effective: {k_NuScale_eq:.6f}")
+with open("flux1_NuScale_eq.txt", 'w') as flux1_file:
+    for flux in flux1_NuScale_eq:
+        flux1_file.write(f"{flux}\n")
+with open("flux2_NuScale_eq.txt", 'w') as flux2_file:
+    for flux in flux2_NuScale_eq:
+        flux2_file.write(f"{flux}\n")
+
+# === Run plot routine ===
+with open("flux1_NuScale_eq.txt", 'r') as flux1_file:
+    lines = flux1_file.readlines()
+    flux1_NuScale_eq = np.array([float(line.strip()) for line in lines])
+with open("flux2_NuScale_eq.txt", 'r') as flux2_file:
+    lines = flux2_file.readlines()
+    flux2_NuScale_eq = np.array([float(line.strip()) for line in lines])
+
+normalize_and_plot(
+    flux1_NuScale_eq, flux2_NuScale_eq, core_NuScale_eq,
+    power_MW=thermal_power,               # reactor thermal power
+    assembly_dim_cm=assembly_ij_dim,         # XY dimension per assembly
+    fuel_height_cm=fuel_k_dim          # axial height of fuel
+)

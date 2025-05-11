@@ -2,7 +2,7 @@ import re
 import pandas as pd
 import pickle
 
-input_filename = "NUu250c00_Cross_Sections.txt"
+input_filename = "NUu455c50_Corrected.txt"
 
 # Prepare storage for data
 data = []
@@ -51,5 +51,5 @@ with open(input_filename, "r") as f:
 df = pd.DataFrame(data)
 
 # Save dataframe
-df.to_csv("XS.csv", index=False)
+df.to_csv("XS455.csv", index=False)
 print("Parsed data saved to NUu250c00_Cross_Sections_parsed.csv")
