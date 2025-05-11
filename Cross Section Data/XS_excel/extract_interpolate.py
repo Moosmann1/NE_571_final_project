@@ -21,7 +21,7 @@ class CrossSectionVocabulary:
             }
             self.vocab[key] = xs_data
 
-    def get(self, burnup, tf, tm, bor, group):
+    def get(self, tf, tm, bor, burnup, group):
         key = (burnup, tf, tm, bor, group)
         if key in self.vocab:
             return self.vocab[key]
@@ -32,7 +32,7 @@ class CrossSectionVocabulary:
         return list(self.vocab.keys())
 
 # Function to handle both exact match and interpolation
-def get_or_interpolate_cross_section(vocab, burnup, tf, tm, bor, group):
+def get_or_interpolate_cross_section(vocab, tf, tm, bor, burnup, group):
     # Filter the data for the fixed parameters (burnup, tf, tm, group)
     filtered_df = vocab.df[
         (vocab.df['BURNUP'] == burnup) &
@@ -70,19 +70,19 @@ def get_or_interpolate_cross_section(vocab, burnup, tf, tm, bor, group):
     
     return interpolated_data
 
-# Example usage with external definitions
-burnup = 0           # Define BURNUP externally
-tf = 1019.3          # Define TF externally
-tm = 557.0           # Define TM externally
-group = 1            # Define GROUP externally
-test_bor = 0        # Define BOR value externally
+# # Example usage with external definitions
+# burnup = 0           # Define BURNUP externally
+# tf = 1019.3          # Define TF externally
+# tm = 557.0           # Define TM externally
+# group = 1            # Define GROUP externally
+# test_bor = 0        # Define BOR value externally
 
-vocab = CrossSectionVocabulary("XS260.csv")  # Load data from the correct CSV file
+# vocab = CrossSectionVocabulary("XS260.csv")  # Load data from the correct CSV file
 
-# Get or interpolate the data for BOR=1 with the external parameters
-interpolated_bor_1 = get_or_interpolate_cross_section(vocab, burnup=burnup, tf=tf, tm=tm, bor=test_bor, group=group)
+# # Get or interpolate the data for BOR=1 with the external parameters
+# interpolated_bor_1 = get_or_interpolate_cross_section(vocab, burnup=burnup, tf=tf, tm=tm, bor=test_bor, group=group)
 
-# Print interpolated data
-print("Interpolated Data for BOR=1:")
-for k, v in interpolated_bor_1.items():
-    print(f"{k}: {v}")
+# # Print interpolated data
+# print("Interpolated Data for BOR=1:")
+# for k, v in interpolated_bor_1.items():
+#     print(f"{k}: {v}")
