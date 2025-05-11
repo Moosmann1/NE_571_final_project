@@ -9,23 +9,35 @@ from core_builder import CoreBuilder
 ### add core maps below
 core_map2 = [
     ['rad', 0], ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],
-    ['rad', 0], ['rad', 0],        ['rad', 0],        ['NUu250c00', 0],  ['NUu250c00', 0],  ['NUu250c00', 0],  ['rad', 0],        ['rad', 0],        ['rad', 0],
-    ['rad', 0], ['rad', 0],        ['NUu250c00', 0],  ['NUu250c00', 0],  ['NUu250c00', 0],  ['NUu250c00', 0],  ['NUu250c00', 0],  ['rad', 0],        ['rad', 0],
-    ['rad', 0], ['NUu250c00', 0],  ['NUu250c00', 0],  ['NUu250c00', 0],  ['NUu250c00', 0],  ['NUu250c00', 0],  ['NUu250c00', 0],  ['NUu250c00', 0],  ['rad', 0],
-    ['rad', 0], ['NUu250c00', 0],  ['NUu250c00', 0],  ['NUu250c00', 0],  ['NUu250c00', 0],  ['NUu250c00', 0],  ['NUu250c00', 0],  ['NUu250c00', 0],  ['rad', 0],
-    ['rad', 0], ['NUu250c00', 0],  ['NUu250c00', 0],  ['NUu250c00', 0],  ['NUu250c00', 0],  ['NUu250c00', 0],  ['NUu250c00', 0],  ['NUu250c00', 0],  ['rad', 0],
-    ['rad', 0], ['rad', 0],        ['NUu250c00', 0],  ['NUu250c00', 0],  ['NUu250c00', 0],  ['NUu250c00', 0],  ['NUu250c00', 0],  ['rad', 0],        ['rad', 0],
-    ['rad', 0], ['rad', 0],        ['rad', 0],        ['NUu250c00', 0],  ['NUu250c00', 0],  ['NUu250c00', 0],  ['rad', 0],        ['rad', 0],        ['rad', 0],
+    ['rad', 0], ['rad', 0],        ['rad', 0],        ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['rad', 0],        ['rad', 0],        ['rad', 0],
+    ['rad', 0], ['rad', 0],        ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['rad', 0],        ['rad', 0],
+    ['rad', 0], ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['rad', 0],
+    ['rad', 0], ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['rad', 0],
+    ['rad', 0], ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['rad', 0],
+    ['rad', 0], ['rad', 0],        ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['rad', 0],        ['rad', 0],
+    ['rad', 0], ['rad', 0],        ['rad', 0],        ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['rad', 0],        ['rad', 0],        ['rad', 0],
+    ['rad', 0], ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],
+]
+
+core_map_checker = [
+    ['rad', 0], ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],
+    ['rad', 0], ['rad', 0],        ['rad', 0],        ['NUu405c00', 0],  ['NUu450c50', 0],  ['NUu405c00', 0],  ['rad', 0],        ['rad', 0],        ['rad', 0],
+    ['rad', 0], ['rad', 0],        ['NUu450c50', 0],  ['NUu405c00', 0],  ['NUu450c50', 0],  ['NUu405c00', 0],  ['NUu450c50', 0],  ['rad', 0],        ['rad', 0],
+    ['rad', 0], ['NUu405c00', 0],  ['NUu450c50', 0],  ['NUu405c00', 0],  ['NUu450c50', 0],  ['NUu405c00', 0],  ['NUu450c50', 0],  ['NUu405c00', 0],  ['rad', 0],
+    ['rad', 0], ['NUu450c50', 0],  ['NUu405c00', 0],  ['NUu450c50', 0],  ['NUu405c00', 0],  ['NUu450c50', 0],  ['NUu405c00', 0],  ['NUu450c50', 0],  ['rad', 0],
+    ['rad', 0], ['NUu405c00', 0],  ['NUu450c50', 0],  ['NUu405c00', 0],  ['NUu450c50', 0],  ['NUu405c00', 0],  ['NUu450c50', 0],  ['NUu405c00', 0],  ['rad', 0],
+    ['rad', 0], ['rad', 0],        ['NUu450c50', 0],  ['NUu405c00', 0],  ['NUu450c50', 0],  ['NUu405c00', 0],  ['NUu450c50', 0],  ['rad', 0],        ['rad', 0],
+    ['rad', 0], ['rad', 0],        ['rad', 0],        ['NUu405c00', 0],  ['NUu450c50', 0],  ['NUu405c00', 0],  ['rad', 0],        ['rad', 0],        ['rad', 0],
     ['rad', 0], ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],
 ]
 
 assembly_only = [
-    ['NUu250c00', 0]
+    ['NUu260c00', 0]
 ]
 
 ### run config_maker below. Comment out when done to avoid overwriting the config files
 
-# CoreBuilder.config_maker(core_map2, core_map2, 1242, 557, 600)  
+CoreBuilder.config_maker("core_map_checker", core_map_checker, 1019.3, 557, 600)  
 
 
 

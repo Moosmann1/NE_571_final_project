@@ -7,16 +7,6 @@ from scipy.sparse.linalg import splu
 from core_builder import CoreBuilder
 from extract import CrossSectionVocabulary
 
-# Update grand_xs_library to include all cross section dataframes when they exist
-# Note the placeholder .csv used. So reflectors are not included yet.
-grand_xs_library = {
-    "NUu250c00": CrossSectionVocabulary("XS.csv"),
-    "rad":       CrossSectionVocabulary("XS.csv"),
-    "BOTREF":    CrossSectionVocabulary("XS.csv"),
-    "TOPREF":    CrossSectionVocabulary("XS.csv"),
-}
-
-
 # Generates the matrixes for the flux search. 
 def matrix(core_map, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim):
     """
@@ -357,24 +347,6 @@ def fluxsearch(A1, A2, B1f, B1t, B2):
     print(f"Time taken to find k: {end_time - start_time:.2f} seconds")
     return k, flux1, flux2
 
-
-# # === Load the core map from config file ===
-core_test = CoreBuilder.core_maker("core_map2")
-
-# # === Define core geometry dimensions ===
-# assembly_ij_dim = 10   # cm (length of one assembly side in X/Y)
-# fuel_k_dim = 200       # cm (height of fuel region)
-# bottom_ref_k_dim = 10  # cm (height of bottom reflector)
-# top_ref_k_dim = 10     # cm (height of top reflector)
-
-# # === Build matrices and solve for flux and k-effective ===
-# A1, A2, B1_fast_fission, B1_thermal_fission, B2 = matrix(
-#     core_test, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim
-# )
-
-# k_1, flux1_1, flux2_1 = fluxsearch(A1, A2, B1_fast_fission, B1_thermal_fission, B2)
-# print(f"Final k-effective: {k_1:.6f}")
-
 # === Normalize flux and plot power/flux maps ===
 def normalize_and_plot(flux1, flux2, core_map, power_MW, assembly_dim_cm, fuel_height_cm):
     import matplotlib.pyplot as plt
@@ -477,19 +449,88 @@ def normalize_and_plot(flux1, flux2, core_map, power_MW, assembly_dim_cm, fuel_h
     plt.grid(True)
     plt.tight_layout()
     plt.show()
-   
-# === Run plot routine ===
 
-with open("flux1_1.txt", 'r') as flux1_file:
+# # === Import necessary libraries ===
+# Update grand_xs_library to include all cross section dataframes when they exist
+# Note the placeholder .csv used. So reflectors are not included yet.
+grand_xs_library = {
+    "NUu260c00": CrossSectionVocabulary("../Cross Section Data/XS_excel/XS260.csv"),
+    "NUu405c00": CrossSectionVocabulary("../Cross Section Data/XS_excel/XS405.csv"),
+    "NUu450c50": CrossSectionVocabulary("../Cross Section Data/XS_excel/XS450.csv"),
+    "rad":       CrossSectionVocabulary("../Cross Section Data/XS_excel/radref.csv"),
+    "BOTREF":    CrossSectionVocabulary("../Cross Section Data/XS_excel/botref.csv"),
+    "TOPREF":    CrossSectionVocabulary("../Cross Section Data/XS_excel/topref.csv"),
+}
+
+# # === Load the core map from config file ===
+# core_2 = CoreBuilder.core_maker("core_map2") # all fresh 2.60 enrich
+
+# # === Define core geometry dimensions ===
+assembly_ij_dim = 21.5   # cm (length of one assembly side in X/Y)(8.466 in) https://www.nrc.gov/docs/ML2022/ML20224A492.pdf
+fuel_k_dim = 200       # cm (height of fuel region) (78.74 in) https://www.nrc.gov/docs/ML2022/ML20224A492.pdf
+bottom_ref_k_dim = 10.16  # cm (height of bottom reflector) (4.00 in) https://www.nrc.gov/docs/ML2022/ML20224A492.pdf
+top_ref_k_dim = 9.02     # cm (height of top reflector) (3.551 in) https://www.nrc.gov/docs/ML2022/ML20224A492.pdf
+
+# # === Build matrices and solve for flux and k-effective ===
+# A1, A2, B1_fast_fission, B1_thermal_fission, B2 = matrix(
+#     core_2, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim
+# )
+
+# k_1, flux1_1, flux2_1 = fluxsearch(A1, A2, B1_fast_fission, B1_thermal_fission, B2)
+# print(f"Final k-effective: {k_1:.6f}")
+
+# with open("flux1_1.txt", 'w') as flux1_file:
+#     for flux in flux1_1:
+#         flux1_file.write(f"{flux}\n")
+# with open("flux2_1.txt", 'w') as flux2_file:
+#     for flux in flux2_1:
+#         flux2_file.write(f"{flux}\n")
+
+# # === Run plot routine ===
+
+# with open("flux1_1.txt", 'r') as flux1_file:
+#     lines = flux1_file.readlines()
+#     flux1_1 = np.array([float(line.strip()) for line in lines])
+# with open("flux2_1.txt", 'r') as flux2_file:
+#     lines = flux2_file.readlines()
+#     flux2_1 = np.array([float(line.strip()) for line in lines])
+
+# normalize_and_plot(
+#     flux1_1, flux2_1, core_2,
+#     power_MW=100,               # reactor thermal power
+#     assembly_dim_cm=assembly_ij_dim,         # XY dimension per assembly
+#     fuel_height_cm=200          # axial height of fuel
+# )
+
+core_checker = CoreBuilder.core_maker("core_map_checker") # checkered 4.05 and 4.50
+
+A1_checker, A2_checker, B1_fast_fission_checker, B1_thermal_fission_checker, B2_checker = matrix(
+    core_checker, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim
+)
+
+k_checker, flux1_checker, flux2_checker = fluxsearch(
+    A1_checker, A2_checker, B1_fast_fission_checker, B1_thermal_fission_checker, B2_checker
+)
+print(f"Final k-effective: {k_checker:.6f}")
+with open("flux1_checker.txt", 'w') as flux1_file:
+    for flux in flux1_checker:
+        flux1_file.write(f"{flux}\n")
+with open("flux2_checker.txt", 'w') as flux2_file:
+    for flux in flux2_checker:
+        flux2_file.write(f"{flux}\n")
+
+# === Run plot routine ===
+with open("flux1_checker.txt", 'r') as flux1_file:
     lines = flux1_file.readlines()
-    flux1_1 = np.array([float(line.strip()) for line in lines])
-with open("flux2_1.txt", 'r') as flux2_file:
+    flux1_checker = np.array([float(line.strip()) for line in lines])
+with open("flux2_checker.txt", 'r') as flux2_file:
     lines = flux2_file.readlines()
-    flux2_1 = np.array([float(line.strip()) for line in lines])
+    flux2_checker = np.array([float(line.strip()) for line in lines])
 
 normalize_and_plot(
-    flux1_1, flux2_1, core_test,
+    flux1_checker, flux2_checker, core_checker,
     power_MW=100,               # reactor thermal power
-    assembly_dim_cm=10,         # XY dimension per assembly
-    fuel_height_cm=200          # axial height of fuel
+    assembly_dim_cm=assembly_ij_dim,         # XY dimension per assembly
+    fuel_height_cm=fuel_k_dim          # axial height of fuel
 )
+
