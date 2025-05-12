@@ -445,6 +445,33 @@ def normalize_and_plot(flux1, flux2, core_map, power_MW, assembly_dim_cm, fuel_h
     plt.tight_layout()
     plt.show()
 
+# === Axial Flux Plot Along Middle Column (Y Direction) ===
+# === 1D Line Plots Along Middle Column ===
+middle_col_flux = [row[4] for row in flux_map]   # middle column (X = 4)
+middle_col_power = [row[4] for row in power_map]
+y = list(range(len(middle_col_flux)))  # Y assembly indices
+
+# Line plot for flux
+plt.figure()
+plt.plot(y, middle_col_flux, marker='o')
+plt.title("Flux Along Middle Column (X = 4)")
+plt.xlabel("Y Assembly Index")
+plt.ylabel("Flux")
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+# Line plot for power
+plt.figure()
+plt.plot(y, middle_col_power, marker='o', color='r')
+plt.title("Power Along Middle Column (X = 4)")
+plt.xlabel("Y Assembly Index")
+plt.ylabel("Power (W)")
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+
 # # === Import necessary libraries ===
 # Update grand_xs_library to include all cross section dataframes when they exist
 # Note the placeholder .csv used. So reflectors are not included yet.
