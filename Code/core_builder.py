@@ -49,8 +49,8 @@ class CoreBuilder:
                 assembly_list.append(parts[0])
                 fuel_temp_list.append(parts[1])
                 mod_temp_list.append(parts[2])
-                bor_list.append(int(parts[3]))
-                dep_list.append(int(parts[4]))
+                bor_list.append(parts[3])
+                dep_list.append(parts[4])
 
             n = 0
             for i in range(int(np.sqrt(len(assembly_list)))):

@@ -31,44 +31,44 @@ class CrossSectionVocabulary:
     def list_keys(self):
         return list(self.vocab.keys())
 
-# Function to handle both exact match and interpolation
-def get_or_interpolate_cross_section(vocab, tf, tm, bor, burnup, group):
-    # Filter the data for the fixed parameters (burnup, tf, tm, group)
-    filtered_df = vocab.df[
-        (vocab.df['BURNUP'] == burnup) &
-        (vocab.df['TF'] == tf) &
-        (vocab.df['TM'] == tm) &
-        (vocab.df['GROUP'] == group)
-    ]
-    
-    # Check if the exact BOR value exists
-    exact_match = filtered_df[filtered_df['BOR'] == bor]
-    if not exact_match.empty:
-        # If exact match found, return the data
-        return exact_match.iloc[0].to_dict()
-    
-    # If exact match not found, interpolate
-    sorted_df = filtered_df.sort_values(by='BOR')
-    
-    # Find the closest BOR values
-    lower_bor = sorted_df[sorted_df['BOR'] <= bor].iloc[-1] if not sorted_df[sorted_df['BOR'] <= bor].empty else None
-    upper_bor = sorted_df[sorted_df['BOR'] >= bor].iloc[0] if not sorted_df[sorted_df['BOR'] >= bor].empty else None
+    # Function to handle both exact match and interpolation
+    def get_or_interpolate_cross_section(self, tf, tm, bor, burnup, group):
+        # Filter the data for the fixed parameters (burnup, tf, tm, group)
+        filtered_df = self.vocab.df[
+            (self.vocab.df['BURNUP'] == burnup) &
+            (self.vocab.df['TF'] == tf) &
+            (self.vocab.df['TM'] == tm) &
+            (self.vocab.df['GROUP'] == group)
+        ]
+        
+        # Check if the exact BOR value exists
+        exact_match = filtered_df[filtered_df['BOR'] == bor]
+        if not exact_match.empty:
+            # If exact match found, return the data
+            return exact_match.iloc[0].to_dict()
+        
+        # If exact match not found, interpolate
+        sorted_df = filtered_df.sort_values(by='BOR')
+        
+        # Find the closest BOR values
+        lower_bor = sorted_df[sorted_df['BOR'] <= bor].iloc[-1] if not sorted_df[sorted_df['BOR'] <= bor].empty else None
+        upper_bor = sorted_df[sorted_df['BOR'] >= bor].iloc[0] if not sorted_df[sorted_df['BOR'] >= bor].empty else None
 
-    if lower_bor is None or upper_bor is None:
-        raise ValueError(f"Can't interpolate for BOR={bor}, it is out of the range.")
+        if lower_bor is None or upper_bor is None:
+            raise ValueError(f"Can't interpolate for BOR={bor}, it is out of the range.")
 
-    # Perform linear interpolation between the two closest BOR values
-    def interpolate_value(lower_value, upper_value, lower_bor, upper_bor, bor):
-        return lower_value + (upper_value - lower_value) * (bor - lower_bor) / (upper_bor - lower_bor)
+        # Perform linear interpolation between the two closest BOR values
+        def interpolate_value(lower_value, upper_value, lower_bor, upper_bor, bor):
+            return lower_value + (upper_value - lower_value) * (bor - lower_bor) / (upper_bor - lower_bor)
 
-    # Interpolate for all cross-section data
-    interpolated_data = {}
-    for column in ['ABSORPTION', 'CAPTURE', 'FISSION', 'NU-FISSION', 'TRANSPORT', 'OUT-SCATTER', 'DIFF(1/3TR)']:
-        interpolated_data[column] = interpolate_value(
-            lower_bor[column], upper_bor[column], lower_bor['BOR'], upper_bor['BOR'], bor
-        )
-    
-    return interpolated_data
+        # Interpolate for all cross-section data
+        interpolated_data = {}
+        for column in ['ABSORPTION', 'CAPTURE', 'FISSION', 'NU-FISSION', 'TRANSPORT', 'OUT-SCATTER', 'DIFF(1/3TR)']:
+            interpolated_data[column] = interpolate_value(
+                lower_bor[column], upper_bor[column], lower_bor['BOR'], upper_bor['BOR'], bor
+            )
+        
+        return interpolated_data
 
 # # Example usage with external definitions
 # burnup = 0           # Define BURNUP externally

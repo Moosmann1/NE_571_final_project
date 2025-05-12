@@ -33,6 +33,10 @@ class CrossSectionVocabulary:
 
 # Function to handle both exact match and interpolation
 def get_or_interpolate_cross_section(vocab, tf, tm, bor, burnup, group):
+    # Ensure BOR is a float for consistent comparisons
+    bor = float(bor)
+    vocab.df['BOR'] = vocab.df['BOR'].astype(float)
+    print(vocab.df['BOR'])
     # Filter the data for the fixed parameters (burnup, tf, tm, group)
     filtered_df = vocab.df[
         (vocab.df['BURNUP'] == burnup) &
@@ -53,7 +57,9 @@ def get_or_interpolate_cross_section(vocab, tf, tm, bor, burnup, group):
     # Find the closest BOR values
     lower_bor = sorted_df[sorted_df['BOR'] <= bor].iloc[-1] if not sorted_df[sorted_df['BOR'] <= bor].empty else None
     upper_bor = sorted_df[sorted_df['BOR'] >= bor].iloc[0] if not sorted_df[sorted_df['BOR'] >= bor].empty else None
-
+    print(lower_bor)
+    print(upper_bor)
+    print(filtered_df)
     if lower_bor is None or upper_bor is None:
         raise ValueError(f"Can't interpolate for BOR={bor}, it is out of the range.")
 
@@ -70,19 +76,19 @@ def get_or_interpolate_cross_section(vocab, tf, tm, bor, burnup, group):
     
     return interpolated_data
 
-# # Example usage with external definitions
-# burnup = 0           # Define BURNUP externally
-# tf = 1019.3          # Define TF externally
-# tm = 557.0           # Define TM externally
-# group = 1            # Define GROUP externally
-# test_bor = 0        # Define BOR value externally
+# Example usage with external definitions
+burnup = 0           # Define BURNUP externally
+tf = 1019.3          # Define TF externally
+tm = 557.0           # Define TM externally
+group = 1            # Define GROUP externally
+test_bor = 750.0        # Define BOR value externally
 
-# vocab = CrossSectionVocabulary("XS260.csv")  # Load data from the correct CSV file
+vocab = CrossSectionVocabulary("../Cross Section Data/XS_excel/XS260.csv")  # Load data from the correct CSV file
 
-# # Get or interpolate the data for BOR=1 with the external parameters
-# interpolated_bor_1 = get_or_interpolate_cross_section(vocab, burnup=burnup, tf=tf, tm=tm, bor=test_bor, group=group)
+# Get or interpolate the data for BOR=1 with the external parameters
+interpolated_bor_1 = get_or_interpolate_cross_section(vocab, burnup=burnup, tf=tf, tm=tm, bor=test_bor, group=group)
 
-# # Print interpolated data
-# print("Interpolated Data for BOR=1:")
-# for k, v in interpolated_bor_1.items():
-#     print(f"{k}: {v}")
+# Print interpolated data
+print("Interpolated Data for BOR=1:")
+for k, v in interpolated_bor_1.items():
+    print(f"{k}: {v}")
