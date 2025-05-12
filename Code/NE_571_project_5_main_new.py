@@ -490,6 +490,32 @@ def normalize_and_plot(flux1, flux2, core_map, power_MW, assembly_dim_cm, fuel_h
     plt.tight_layout()
     plt.show()
 
+    # === Axial Flux Plot Along Middle Column (Y Direction) ===
+    # === 1D Line Plots Along Middle Column ===
+    middle_col_flux = [row[4] for row in flux_map]   # middle column (X = 4)
+    middle_col_power = [row[4] for row in power_map]
+    y = list(range(len(middle_col_flux)))  # Y assembly indices
+
+    # Line plot for flux
+    plt.figure()
+    plt.plot(y, middle_col_flux, marker='o')
+    plt.title("Flux Along Middle Column (X = 4)")
+    plt.xlabel("Y Assembly Index")
+    plt.ylabel("Flux")
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+    # Line plot for power
+    plt.figure()
+    plt.plot(y, middle_col_power, marker='o', color='r')
+    plt.title("Power Along Middle Column (X = 4)")
+    plt.xlabel("Y Assembly Index")
+    plt.ylabel("Power (W)")
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+    
 def bisection_boron(core_name, assembly_map, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim, thermal_power, tol=1e-6, max_iter=100):
     """
     Perform bisection to adjust boron concentration to achieve critical k_eff (k_eff ≈ 1.0).
