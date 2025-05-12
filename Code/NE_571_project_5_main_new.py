@@ -499,6 +499,7 @@ def normalize_and_plot(flux1, flux2, core_map, power_MW, assembly_dim_cm, fuel_h
     plt.show()
 
     # Plot axial power
+    # Plot axial power
     plt.figure()
     plt.plot(range(0, 20), axial_power, marker='s', color='orange')
     plt.title("Axial Power Along Central Column (i=45, j=45)")
