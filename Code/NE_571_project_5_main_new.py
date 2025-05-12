@@ -5,55 +5,18 @@ from scipy.linalg import lu_factor, lu_solve
 from scipy.sparse import diags, csr_matrix
 from scipy.sparse.linalg import splu
 from core_builder import CoreBuilder
-from extract_interpolate import CrossSectionVocabulary
+from extract import CrossSectionVocabulary
 
-# Function to handle both exact match and interpolation
-def get_or_interpolate_cross_section(vocab, tf, tm, bor, burnup, group):
-    # Ensure BOR is a float for consistent comparisons
-    bor = float(bor)
-    vocab.df['BOR'] = vocab.df['BOR'].astype(float)
-    print(vocab.df['BOR'])
-    # Filter the data for the fixed parameters (burnup, tf, tm, group)
-    filtered_df = vocab.df[
-        (vocab.df['BURNUP'] == burnup) &
-        (vocab.df['TF'] == tf) &
-        (vocab.df['TM'] == tm) &
-        (vocab.df['GROUP'] == group)
-    ]
-    
-    # Check if the exact BOR value exists
-    exact_match = filtered_df[filtered_df['BOR'] == bor]
-    if not exact_match.empty:
-        # If exact match found, return the data
-        return exact_match.iloc[0].to_dict()
-    
-    # If exact match not found, interpolate
-    sorted_df = filtered_df.sort_values(by='BOR')
-    
-    # Find the closest BOR values
-    lower_bor = sorted_df[sorted_df['BOR'] <= bor].iloc[-1] if not sorted_df[sorted_df['BOR'] <= bor].empty else None
-    upper_bor = sorted_df[sorted_df['BOR'] >= bor].iloc[0] if not sorted_df[sorted_df['BOR'] >= bor].empty else None
-    print(lower_bor)
-    print(upper_bor)
-    print(filtered_df)
-    if lower_bor is None or upper_bor is None:
-        raise ValueError(f"Can't interpolate for BOR={bor}, it is out of the range.")
-
-    # Perform linear interpolation between the two closest BOR values
-    def interpolate_value(lower_value, upper_value, lower_bor, upper_bor, bor):
-        return lower_value + (upper_value - lower_value) * (bor - lower_bor) / (upper_bor - lower_bor)
-
-    # Interpolate for all cross-section data
-    interpolated_data = {}
-    for column in ['ABSORPTION', 'CAPTURE', 'FISSION', 'NU-FISSION', 'TRANSPORT', 'OUT-SCATTER', 'DIFF(1/3TR)']:
-        interpolated_data[column] = interpolate_value(
-            lower_bor[column], upper_bor[column], lower_bor['BOR'], upper_bor['BOR'], bor
-        )
-    
-    return interpolated_data
+def get(self, tf, tm, bor, burnup, group):
+    key = (burnup, tf, tm, bor, group)
+    if key in self.vocab:
+        return self.vocab[key]
+    else:
+        raise KeyError(f"No cross section data found for: BURNUP={burnup}, TF={tf}, TM={tm}, BOR={bor}, GROUP={group}")
+ 
 
 # Generates the matrixes for the flux search. 
-def matrix(core_map, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim):
+def matrix(grand_library, core_map, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim):
     """
     Generates the matrices for the flux search in a nuclear reactor core.
         
@@ -138,14 +101,14 @@ def matrix(core_map, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_di
                     dk = dk_fuel
 
                 # Get the cross-section data for the central node
-                fast_xs_central = get_or_interpolate_cross_section(CrossSectionVocabulary("../Cross Section Data/XS_excel/radref.csv"),
+                fast_xs_central = get(grand_library[core_map[i, j, k][0]],
                     float(core_map[i, j, k][1]),
                     float(core_map[i, j, k][2]),
-                    750,
+                    float(core_map[i, j, k][3]),
                     float(core_map[i, j, k][4]),
                     1.0
                 )
-                thermal_xs_central = grand_xs_library[core_map[i, j, k][0]].get_or_interpolate_cross_section(
+                thermal_xs_central = get(grand_library[core_map[i, j, k][0]],
                     float(core_map[i, j, k][1]),
                     float(core_map[i, j, k][2]),
                     float(core_map[i, j, k][3]),
@@ -175,52 +138,52 @@ def matrix(core_map, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_di
                 # Handle off-diagonals (e.g., west, east, etc.)
                 if i > 0:  # West
                     # cross sections
-                    fast_xs_west = grand_xs_library[core_map[i-1, j, k][0]].get_or_interpolate_cross_section(
+                    fast_xs_west = get(grand_library[core_map[i-1, j, k][0]],
                         float(core_map[i-1, j, k][1]), 
                         float(core_map[i-1, j, k][2]), 
                         float(core_map[i-1, j, k][3]), 
                         float(core_map[i-1, j, k][4]), 
                         1.0)
-                    thermal_xs_west = grand_xs_library[core_map[i-1, j, k][0]].get_or_interpolate_cross_section(
+                    thermal_xs_west = get(grand_library[core_map[i-1, j, k][0]],
                         float(core_map[i-1, j, k][1]), 
                         float(core_map[i-1, j, k][2]), 
                         float(core_map[i-1, j, k][3]), 
                         float(core_map[i-1, j, k][4]), 
                         2.0)
                     
-                    # populatre the matrix diagonals
+                    # populate the matrix diagonals
                     west_fast[it] = -1 * fast_xs_west["DIFF(1/3TR)"] / di_core**2
                     west_thermal[it] = -1 * thermal_xs_west["DIFF(1/3TR)"] / di_core**2
 
                 if i < core_map.shape[0] - 1:  # East
                     # cross sections
-                    fast_xs_east = grand_xs_library[core_map[i+1, j, k][0]].get_or_interpolate_cross_section(
+                    fast_xs_east = get(grand_library[core_map[i+1, j, k][0]],
                         float(core_map[i+1, j, k][1]), 
                         float(core_map[i+1, j, k][2]), 
                         float(core_map[i+1, j, k][3]), 
                         float(core_map[i+1, j, k][4]), 
                         1.0)
-                    thermal_xs_east = grand_xs_library[core_map[i+1, j, k][0]].get_or_interpolate_cross_section(
+                    thermal_xs_east = get(grand_library[core_map[i+1, j, k][0]],
                         float(core_map[i+1, j, k][1]), 
                         float(core_map[i+1, j, k][2]), 
                         float(core_map[i+1, j, k][3]), 
                         float(core_map[i+1, j, k][4]), 
                         2.0)
                     
-                    # populatre the matrix diagonals
+                    # populate the matrix diagonals
                     east_fast[it] = -1 * fast_xs_east["DIFF(1/3TR)"] / di_core**2
                     east_thermal[it] = -1 * thermal_xs_east["DIFF(1/3TR)"] / di_core**2
                 
                 if j > 0:  # South
                     # cross sections
-                    fast_xs_south = grand_xs_library[core_map[i, j - 1, k][0]].get_or_interpolate_cross_section(
+                    fast_xs_south = get(grand_library[core_map[i, j - 1, k][0]],
                         float(core_map[i, j - 1, k][1]),
                         float(core_map[i, j - 1, k][2]),
                         float(core_map[i, j - 1, k][3]),
                         float(core_map[i, j - 1, k][4]),
                         1.0
                     )
-                    thermal_xs_south = grand_xs_library[core_map[i, j - 1, k][0]].get_or_interpolate_cross_section(
+                    thermal_xs_south = get(grand_library[core_map[i, j - 1, k][0]],
                         float(core_map[i, j - 1, k][1]),
                         float(core_map[i, j - 1, k][2]),
                         float(core_map[i, j - 1, k][3]),
@@ -228,68 +191,68 @@ def matrix(core_map, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_di
                         2.0
                     )
                     
-                    # populatre the matrix diagonals
+                    # populate the matrix diagonals
                     south_fast[it] = -1 * fast_xs_south["DIFF(1/3TR)"] / dj_core**2
                     south_thermal[it] = -1 * thermal_xs_south["DIFF(1/3TR)"] / dj_core**2
 
                 if j < core_map.shape[1] - 1:  # North
                     # cross sections
-                    fast_xs_north = grand_xs_library[core_map[i, j+1, k][0]].get_or_interpolate_cross_section(
+                    fast_xs_north = get(grand_library[core_map[i, j+1, k][0]],
                         float(core_map[i, j+1, k][1]), 
                         float(core_map[i, j+1, k][2]), 
                         float(core_map[i, j+1, k][3]), 
                         float(core_map[i, j+1, k][4]), 
                         1.0)
-                    thermal_xs_north = grand_xs_library[core_map[i, j+1, k][0]].get_or_interpolate_cross_section(
+                    thermal_xs_north = get(grand_library[core_map[i, j+1, k][0]],
                         float(core_map[i, j+1, k][1]), 
                         float(core_map[i, j+1, k][2]), 
                         float(core_map[i, j+1, k][3]), 
                         float(core_map[i, j+1, k][4]), 
                         2.0)
                     
-                    # populatre the matrix diagonals
+                    # populate the matrix diagonals
                     north_fast[it] = -1 * fast_xs_north["DIFF(1/3TR)"] / dj_core**2
                     north_thermal[it] = -1 * thermal_xs_north["DIFF(1/3TR)"] / dj_core**2
                 
                 if k > 0:  # Down
                     # cross sections
-                    fast_xs_down = grand_xs_library[core_map[i, j, k-1][0]].get_or_interpolate_cross_section(
+                    fast_xs_down = get(grand_library[core_map[i, j, k-1][0]],
                         float(core_map[i, j, k-1][1]), 
                         float(core_map[i, j, k-1][2]), 
                         float(core_map[i, j, k-1][3]), 
                         float(core_map[i, j, k-1][4]), 
                         1.0)
-                    thermal_xs_down = grand_xs_library[core_map[i, j, k-1][0]].get_or_interpolate_cross_section(
+                    thermal_xs_down = get(grand_library[core_map[i, j, k-1][0]],
                         float(core_map[i, j, k-1][1]), 
                         float(core_map[i, j, k-1][2]), 
                         float(core_map[i, j, k-1][3]), 
                         float(core_map[i, j, k-1][4]), 
                         2.0)
                     
-                    # populatre the matrix diagonals
+                    # populate the matrix diagonals
                     down_fast[it] = -1 * fast_xs_down["DIFF(1/3TR)"] / dk**2
                     down_thermal[it] = -1 * thermal_xs_down["DIFF(1/3TR)"] / dk**2
                 
                 if k < core_map.shape[2] - 1:  # Up
                     # cross sections
-                    fast_xs_up = grand_xs_library[core_map[i, j, k+1][0]].get_or_interpolate_cross_section(
+                    fast_xs_up = get(grand_library[core_map[i, j, k+1][0]],
                         float(core_map[i, j, k+1][1]), 
                         float(core_map[i, j, k+1][2]), 
                         float(core_map[i, j, k+1][3]), 
                         float(core_map[i, j, k+1][4]), 
                         1.0)
-                    thermal_xs_up = grand_xs_library[core_map[i, j, k+1][0]].get_or_interpolate_cross_section(
+                    thermal_xs_up = get(grand_library[core_map[i, j, k+1][0]],
                         float(core_map[i, j, k+1][1]), 
                         float(core_map[i, j, k+1][2]), 
                         float(core_map[i, j, k+1][3]), 
                         float(core_map[i, j, k+1][4]), 
                         2.0)
                     
-                    # populatre the matrix diagonals
+                    # populate the matrix diagonals
                     up_fast[it] = -1 * fast_xs_up["DIFF(1/3TR)"] / dk**2
                     up_thermal[it] = -1 * thermal_xs_up["DIFF(1/3TR)"] / dk**2
 
-                print(it)
+                # print(it)
                 it += 1
     
     # CSC formating for LU decomposition (sprase matrix)
@@ -490,33 +453,62 @@ def normalize_and_plot(flux1, flux2, core_map, power_MW, assembly_dim_cm, fuel_h
     plt.tight_layout()
     plt.show()
 
-    # === Axial Flux Plot Along Middle Column (Y Direction) ===
-    # === 1D Line Plots Along Middle Column ===
-    middle_col_flux = [row[4] for row in flux_map]   # middle column (X = 4)
-    middle_col_power = [row[4] for row in power_map]
-    y = list(range(len(middle_col_flux)))  # Y assembly indices
+    # === Axial Flux Plot Along Middle Column (Z Direction) ===
+    # === Axial Flux Plot Along Middle Column ===
+    mid_i = 45
+    mid_j = 45
+    axial_flux = []
+    axial_power = []
 
-    # Line plot for flux
+    for k in range(20):  # loop over all axial layers
+        flat_idx = mid_i + 90 * mid_j + 90 * 90 * k
+        entry = core_map[mid_i, mid_j, k]
+        mat = entry[0]
+        tf = float(entry[1])
+        tm = float(entry[2])
+        bor = float(entry[3])
+        dep = float(entry[4])
+
+        xs1 = grand_xs_library[mat].get(tf, tm, bor, dep, 1.0)
+        xs2 = grand_xs_library[mat].get(tf, tm, bor, dep, 2.0)
+
+        sigf1 = xs1["FISSION"]
+        sigf2 = xs2["FISSION"]
+
+        phi1 = flux1[flat_idx]
+        phi2 = flux2[flat_idx]
+        total_flux = phi1 + phi2
+        total_power = (phi1 * sigf1 + phi2 * sigf2) * node_vol_cm3 * energy_per_fission
+
+        axial_flux.append(total_flux)
+        axial_power.append(total_power)
+
+    # Plot axial flux
+    dr_bottom_ref = bottom_ref_k_dim / 5
+    dr_fuel = fuel_k_dim / 10
+    dr_top_ref = top_ref_k_dim / 5
+    physical_steps = [0, 1*dr_bottom_ref, 2*dr_bottom_ref, 3*dr_bottom_ref, 4*dr_bottom_ref,5*dr_fuel, 6*dr_fuel, 7*dr_fuel, 8*dr_fuel, 9*dr_fuel, 10*dr_fuel, 11*dr_fuel, 12*dr_fuel, 13*dr_fuel, 14*dr_fuel, 15*dr_top_ref, 16*dr_top_ref, 17*dr_top_ref, 18*dr_top_ref, 19*dr_top_ref]
+    
     plt.figure()
-    plt.plot(y, middle_col_flux, marker='o')
-    plt.title("Flux Along Middle Column (X = 4)")
-    plt.xlabel("Y Assembly Index")
+    plt.plot(physical_steps, axial_flux, marker='s')
+    plt.title("Axial Flux Along Central Column (i=45, j=45)")
+    plt.xlabel("Z Node Index")
     plt.ylabel("Flux")
     plt.grid(True)
     plt.tight_layout()
     plt.show()
 
-    # Line plot for power
+    # Plot axial power
     plt.figure()
-    plt.plot(y, middle_col_power, marker='o', color='r')
-    plt.title("Power Along Middle Column (X = 4)")
-    plt.xlabel("Y Assembly Index")
+    plt.plot(range(0, 20), axial_power, marker='s', color='orange')
+    plt.title("Axial Power Along Central Column (i=45, j=45)")
+    plt.xlabel("Z Node Index")
     plt.ylabel("Power (W)")
     plt.grid(True)
     plt.tight_layout()
     plt.show()
     
-def bisection_boron(core_name, assembly_map, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim, thermal_power, tol=1e-6, max_iter=100):
+def bisection_boron(core_name, assembly_map, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim, thermal_power, tol=1e-4, max_iter=100):
     """
     Perform bisection to adjust boron concentration to achieve critical k_eff (k_eff ≈ 1.0).
 
@@ -537,7 +529,7 @@ def bisection_boron(core_name, assembly_map, assembly_ij_dim, fuel_k_dim, bottom
     """
     # Initial boron bounds
     boron_low = 600  # ppm
-    boron_high = 900  # ppm (example upper bound)
+    boron_high = 1000  # ppm (example upper bound)
     boron_critical = None
 
     # Initialize CoreBuilder
@@ -548,11 +540,13 @@ def bisection_boron(core_name, assembly_map, assembly_ij_dim, fuel_k_dim, bottom
         boron_mid = (boron_low + boron_high) / 2
 
         # Write a new configuration file with the updated boron concentration
-        builder.config_maker(core_name, assembly_map, fuel_temp=1200, mod_temp=557, boron=boron_mid)
+        builder.config_maker(core_name, assembly_map, fuel_temp=1019.3, mod_temp=557, boron=boron_mid)
 
         # Generate the core and matrices
+        interpolated_xs_library = interpolate_xs(grand_xs_library, boron_mid)
+
         core = CoreBuilder.core_maker(core_name)
-        A1, A2, B1_fast_fission, B1_thermal_fission, B2 = matrix(core, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim)
+        A1, A2, B1_fast_fission, B1_thermal_fission, B2 = matrix(interpolated_xs_library, core, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim)
 
         # Perform flux search to calculate k_eff
         k_eff, flux1, flux2 = fluxsearch(A1, A2, B1_fast_fission, B1_thermal_fission, B2)
@@ -590,8 +584,66 @@ grand_xs_library = {
     "TOPREF":    CrossSectionVocabulary("../Cross Section Data/XS_excel/topref.csv"),
 }
 
+import pandas as pd
+def interpolate_xs(grand_xs_library_loc, boron):
+    for material, vocab in grand_xs_library_loc.items():
+        # Get the DataFrame from the CrossSectionVocabulary object
+        df = vocab.df
+
+        # Ensure BOR is a float for consistent comparisons
+        df['BOR'] = df['BOR'].astype(float)
+
+        # Check if the boron value already exists
+        if boron in df['BOR'].values:
+            print(f"Boron value {boron} ppm already exists for material {material}. Skipping interpolation.")
+            continue
+
+        # Perform interpolation for each unique combination of BURNUP, TF, TM, and GROUP
+        interpolated_rows = []
+        for (burnup, tf, tm, group), group_df in df.groupby(['BURNUP', 'TF', 'TM', 'GROUP']):
+            # Sort by BOR for interpolation
+            group_df = group_df.sort_values(by='BOR')
+
+            # Find the closest BOR values for interpolation
+            lower_row = group_df[group_df['BOR'] <= boron].iloc[-1] if not group_df[group_df['BOR'] <= boron].empty else None
+            upper_row = group_df[group_df['BOR'] >= boron].iloc[0] if not group_df[group_df['BOR'] >= boron].empty else None
+
+            if lower_row is None or upper_row is None:
+                print(f"Cannot interpolate for BOR={boron} ppm in material {material} for BURNUP={burnup}, TF={tf}, TM={tm}, GROUP={group}.")
+                continue
+
+            # Perform linear interpolation for all cross-section columns
+            interpolated_data = {'BOR': boron, 'BURNUP': burnup, 'TF': tf, 'TM': tm, 'GROUP': group}
+            for column in ['ABSORPTION', 'CAPTURE', 'FISSION', 'NU-FISSION', 'TRANSPORT', 'OUT-SCATTER', 'DIFF(1/3TR)']:
+                interpolated_data[column] = lower_row[column] + (
+                    (upper_row[column] - lower_row[column]) * (boron - lower_row['BOR']) / (upper_row['BOR'] - lower_row['BOR'])
+                )
+
+            interpolated_rows.append(interpolated_data)
+
+        # Add the interpolated rows to the DataFrame
+        if interpolated_rows:
+            interpolated_df = pd.DataFrame(interpolated_rows)
+            vocab.df = pd.concat([df, interpolated_df], ignore_index=True).sort_values(by=['BURNUP', 'TF', 'TM', 'GROUP', 'BOR'])
+
+            # Update the vocab dictionary
+            for _, row in interpolated_df.iterrows():
+                key = (row["BURNUP"], row["TF"], row["TM"], row["BOR"], row["GROUP"])
+                vocab.vocab[key] = {
+                    "ABSORPTION": row["ABSORPTION"],
+                    "CAPTURE": row["CAPTURE"],
+                    "FISSION": row["FISSION"],
+                    "NU-FISSION": row["NU-FISSION"],
+                    "TRANSPORT": row["TRANSPORT"],
+                    "OUT-SCATTER": row["OUT-SCATTER"],
+                    "DIFF(1/3TR)": row["DIFF(1/3TR)"],
+                }
+
+    return grand_xs_library_loc
+
+
 # # === Load the core map from config file ===
-# core_2 = CoreBuilder.core_maker("core_map2") # all fresh 2.60 enrich
+core_2 = CoreBuilder.core_maker("core_map2") # all fresh 2.60 enrich
 
 # # === Define core geometry dimensions ===
 assembly_ij_dim = 21.5    # cm (length of one assembly side in X/Y)(8.466 in) https://www.nrc.gov/docs/ML2022/ML20224A492.pdf
@@ -615,7 +667,7 @@ thermal_power = 160       # MWt https://www.nrc.gov/docs/ML2022/ML20224A492.pdf
 #     for flux in flux2_1:
 #         flux2_file.write(f"{flux}\n")
 
-# # === Run plot routine ===
+# === Run plot routine ===
 
 # with open("flux1_1.txt", 'r') as flux1_file:
 #     lines = flux1_file.readlines()
@@ -663,7 +715,7 @@ thermal_power = 160       # MWt https://www.nrc.gov/docs/ML2022/ML20224A492.pdf
 #     fuel_height_cm=fuel_k_dim          # axial height of fuel
 # )
 
-# core_NuScale_eq = CoreBuilder.core_maker("core_map_NuScale_eq") # checkered 4.05 and 4.55
+core_NuScale_eq = CoreBuilder.core_maker("core_map_NuScale_eq") # checkered 4.05 and 4.55
 
 # A1_NuScale_eq, A2_NuScale_eq, B1_fast_fission_NuScale_eq, B1_thermal_fission_NuScale_eq, B2_NuScale_eq = matrix(
 #     core_NuScale_eq, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim

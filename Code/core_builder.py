@@ -19,7 +19,6 @@ class CoreBuilder:
                         assembly[i, j, k] = np.array(["TOPREF", fuel_temp, mod_temp, bor, 0])
                     else:
                         assembly[i, j, k] = np.array([assembly_ID, fuel_temp, mod_temp, bor, dep])
-        print(assembly.shape)
         return assembly
 
     @staticmethod
@@ -63,7 +62,6 @@ class CoreBuilder:
                         dep_list[n]
                     )
                     n += 1
-            print(core.shape)
         return core
 
     @staticmethod
