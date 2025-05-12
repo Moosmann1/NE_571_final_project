@@ -20,7 +20,7 @@ class CrossSectionVocabulary:
             }
             self.vocab[key] = xs_data
 
-    def get(self, burnup, tf, tm, bor, group):
+    def get(self, tf, tm, bor, burnup, group):
         key = (burnup, tf, tm, bor, group)
         if key in self.vocab:
             return self.vocab[key]
@@ -32,7 +32,7 @@ class CrossSectionVocabulary:
 
 # ------------------------------
 # Example usage
-
+"""
 # Create instance from CSV
 vocab = CrossSectionVocabulary("XS.csv")
 
@@ -111,3 +111,4 @@ print("TRANSPORT:", TRANSPORT)
 print("OUT_SCATTER:", OUT_SCATTER)
 print("DIFF:", DIFF)
 
+"""

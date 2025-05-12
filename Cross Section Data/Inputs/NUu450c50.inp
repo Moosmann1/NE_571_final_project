@@ -1,0 +1,60 @@
+* ------------------------------------------------------*
+*                  SMR BRANCHING CASE                   *
+* ------------------------------------------------------*
+
+TTL  * NuScale PWR MODEL - FUEL NU455G00 BASE AND BRANCHES
+
+************ INVARIANT DATA **************
+PDE 65 'KWL' 
+PRE 127.6 
+TFU 1019.261
+TMO 557
+BOR 0 200 400 600 800 1000 1200 1400 1600 1800
+PWR 17  1.26 21.50
+PIN 1   0.410   0.417   0.475 * FUEL PIN 
+******************************************
+
+
+***** SEGMENT SPECIFIC
+*      SEGNAME   
+SIM, 'NUu450c50'
+FUE 1, 10.1748 / 4.55   64016=5.00 * Assumed 5%
+*
+* Theoritical density = 10.1928
+* Packing density assumed 96%
+* row(UO2) - 0.3 * w/o(Gd203)
+
+LPI
+2
+1  1
+1  1  1
+3  1  1  3
+1  1  1  1  1
+1  1  1  1  1  3  
+3  1  1  3  1  1  1  
+1  1  1  1  1  1  1  1
+1  1  1  1  1  1  1  1  1
+
+*****
+
+***** STANDARD MECHANICAL DESIGN SPECIFIC *********
+PIN 2  0.573   0.613  / 'MOD'    'BOX'  * INSTR TUBE
+PIN 3  0.573   0.613 /  'MOD'    'BOX'  * GUIDE TUBE
+
+PIN 3   0.434  0.438  0.485  0.573   0.613  / 
+        'AIC'  'AIR'  'CRS'   'MOD'   'BOX' 
+        // 1  'CR1' 'ROD'            * RCCA
+
+SPA 14.574,,, 8.14 / 718=79.55  347=20.45  * SPACER 
+****************************************************
+
+* Provides limits of average burnup at 35000 MWd/t
+* https://www.ans.org/news/article-4013/nuscale-responds-to-smr-critique/;/
+*
+DEP ,  -35.00
+*
+AVE 'CELL' / 0 1 0 0 0 0  * FOR TWO GROUP CROSS SECTIONS
+*
+COE ,, -35.00
+
+END

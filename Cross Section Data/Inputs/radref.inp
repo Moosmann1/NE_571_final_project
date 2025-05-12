@@ -1,0 +1,45 @@
+* ------------------------------------------------------*
+*                   SMR PWR MODEL                       *
+* ------------------------------------------------------*
+
+TIT * GENERIC NuScale MODEL - RADIAL BAFFLE/REFLECTOR
+
+************ INVARIANT DATA **************
+PDE 65 'KWL' 
+PRE 127.6 
+TFU 1019.261
+TMO 557
+PWR 17 1.26  21.50
+PIN 1   0.410   0.417   0.475 * FUEL PIN 
+******************************************
+
+
+***** SEGMENT SPECIFIC
+*      SEGNAME    ENR  EBA BAP BAO 
+SIM, 'RADREF' 
+FUE 1, 10.1928 / 2.60
+
+LPI
+2
+1  1
+1  1  1
+3  1  1  3
+1  1  1  1  1
+1  1  1  1  1  3  
+3  1  1  3  1  1  1  
+1  1  1  1  1  1  1  1
+1  1  1  1  1  1  1  1  1
+*****
+
+***** STANDARD MECHANICAL DESIGN SPECIFIC *********
+PIN 2  0.573   0.613  / 'MOD'    'BOX'  * INSTR TUBE
+PIN 3  0.573   0.613 /  'MOD'    'BOX'  * GUIDE TUBE
+
+SPA 14.574,,, 8.14 / 718=79.55  347=20.45  * SPACER 
+****************************************************
+
+
+BOR , 0 200 400  600 800 1000 1200 1400 1800
+REF 2.223 10 / 'CRS' 'COO' /// 'RAD' 
+S3C 'HOT'
+END

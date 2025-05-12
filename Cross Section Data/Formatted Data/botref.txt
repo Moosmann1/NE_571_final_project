@@ -1,0 +1,143 @@
+ * BURNUP =     0.000 V= 0.0  TF=1019.3  TM= 557.0  BOR=   0.0                                        
+
+                                                   P0-SCATTERING
+ FROM GROUP  1
+  5.95129E-01  1.12151E-02
+ FROM GROUP  2
+  2.68903E-03  1.25962E+00
+
+ RFH  AVERAGED CROSS SECTIONS
+ ****************************
+
+ GROUP    ABSORPTION       CAPTURE       FISSION    NU-FISSION     TRANSPORT   OUT-SCATTER   DIFF(1/3TR)
+     1   1.34985E-03   1.34985E-03   0.00000E+00   0.00000E+00   2.36110E-01   1.91123E-02   1.41177E+00
+     2   2.92113E-02   2.92113E-02   0.00000E+00   0.00000E+00   1.12007E+00   2.22105E-03   2.97600E-01
+--
+--
+ * BURNUP =     0.000 V= 0.0  TF=1019.3  TM= 557.0  BOR= 200.0                                        
+
+                                                   P0-SCATTERING
+ FROM GROUP  1
+  5.95088E-01  1.11901E-02
+ FROM GROUP  2
+  2.72976E-03  1.25847E+00
+
+ RFH  AVERAGED CROSS SECTIONS
+ ****************************
+
+ GROUP    ABSORPTION       CAPTURE       FISSION    NU-FISSION     TRANSPORT   OUT-SCATTER   DIFF(1/3TR)
+     1   1.40042E-03   1.40042E-03   0.00000E+00   0.00000E+00   2.36116E-01   1.90707E-02   1.41174E+00
+     2   3.14449E-02   3.14449E-02   0.00000E+00   0.00000E+00   1.11991E+00   2.25466E-03   2.97643E-01
+--
+--
+ * BURNUP =     0.000 V= 0.0  TF=1019.3  TM= 557.0  BOR= 400.0                                        
+
+                                                   P0-SCATTERING
+ FROM GROUP  1
+  5.95047E-01  1.11652E-02
+ FROM GROUP  2
+  2.77014E-03  1.25734E+00
+
+ RFH  AVERAGED CROSS SECTIONS
+ ****************************
+
+ GROUP    ABSORPTION       CAPTURE       FISSION    NU-FISSION     TRANSPORT   OUT-SCATTER   DIFF(1/3TR)
+     1   1.45082E-03   1.45082E-03   0.00000E+00   0.00000E+00   2.36121E-01   1.90292E-02   1.41171E+00
+     2   3.36627E-02   3.36627E-02   0.00000E+00   0.00000E+00   1.11977E+00   2.28796E-03   2.97681E-01
+--
+--
+ * BURNUP =     0.000 V= 0.0  TF=1019.3  TM= 557.0  BOR= 600.0                                        
+
+                                                   P0-SCATTERING
+ FROM GROUP  1
+  5.95006E-01  1.11404E-02
+ FROM GROUP  2
+  2.81015E-03  1.25622E+00
+
+ RFH  AVERAGED CROSS SECTIONS
+ ****************************
+
+ GROUP    ABSORPTION       CAPTURE       FISSION    NU-FISSION     TRANSPORT   OUT-SCATTER   DIFF(1/3TR)
+     1   1.50106E-03   1.50106E-03   0.00000E+00   0.00000E+00   2.36126E-01   1.89879E-02   1.41167E+00
+     2   3.58721E-02   3.58721E-02   0.00000E+00   0.00000E+00   1.11966E+00   2.32103E-03   2.97710E-01
+--
+--
+ * BURNUP =     0.000 V= 0.0  TF=1019.3  TM= 557.0  BOR= 800.0                                        
+
+                                                   P0-SCATTERING
+ FROM GROUP  1
+  5.94965E-01  1.11156E-02
+ FROM GROUP  2
+  2.84983E-03  1.25511E+00
+
+ RFH  AVERAGED CROSS SECTIONS
+ ****************************
+
+ GROUP    ABSORPTION       CAPTURE       FISSION    NU-FISSION     TRANSPORT   OUT-SCATTER   DIFF(1/3TR)
+     1   1.55115E-03   1.55115E-03   0.00000E+00   0.00000E+00   2.36131E-01   1.89468E-02   1.41165E+00
+     2   3.80694E-02   3.80694E-02   0.00000E+00   0.00000E+00   1.11957E+00   2.35384E-03   2.97732E-01
+--
+--
+ * BURNUP =     0.000 V= 0.0  TF=1019.3  TM= 557.0  BOR=1000.0                                        
+
+                                                   P0-SCATTERING
+ FROM GROUP  1
+  5.94924E-01  1.10910E-02
+ FROM GROUP  2
+  2.88916E-03  1.25402E+00
+
+ RFH  AVERAGED CROSS SECTIONS
+ ****************************
+
+ GROUP    ABSORPTION       CAPTURE       FISSION    NU-FISSION     TRANSPORT   OUT-SCATTER   DIFF(1/3TR)
+     1   1.60107E-03   1.60107E-03   0.00000E+00   0.00000E+00   2.36136E-01   1.89058E-02   1.41162E+00
+     2   4.02549E-02   4.02549E-02   0.00000E+00   0.00000E+00   1.11951E+00   2.38638E-03   2.97748E-01
+--
+--
+ * BURNUP =     0.000 V= 0.0  TF=1019.3  TM= 557.0  BOR=1200.0                                        
+
+                                                   P0-SCATTERING
+ FROM GROUP  1
+  5.94883E-01  1.10664E-02
+ FROM GROUP  2
+  2.92816E-03  1.25294E+00
+
+ RFH  AVERAGED CROSS SECTIONS
+ ****************************
+
+ GROUP    ABSORPTION       CAPTURE       FISSION    NU-FISSION     TRANSPORT   OUT-SCATTER   DIFF(1/3TR)
+     1   1.65084E-03   1.65084E-03   0.00000E+00   0.00000E+00   2.36140E-01   1.88650E-02   1.41159E+00
+     2   4.24285E-02   4.24285E-02   0.00000E+00   0.00000E+00   1.11948E+00   2.41867E-03   2.97758E-01
+--
+--
+ * BURNUP =     0.000 V= 0.0  TF=1019.3  TM= 557.0  BOR=1400.0                                        
+
+                                                   P0-SCATTERING
+ FROM GROUP  1
+  5.94843E-01  1.10419E-02
+ FROM GROUP  2
+  2.96683E-03  1.25188E+00
+
+ RFH  AVERAGED CROSS SECTIONS
+ ****************************
+
+ GROUP    ABSORPTION       CAPTURE       FISSION    NU-FISSION     TRANSPORT   OUT-SCATTER   DIFF(1/3TR)
+     1   1.70046E-03   1.70046E-03   0.00000E+00   0.00000E+00   2.36144E-01   1.88243E-02   1.41157E+00
+     2   4.45905E-02   4.45905E-02   0.00000E+00   0.00000E+00   1.11946E+00   2.45070E-03   2.97763E-01
+--
+--
+ * BURNUP =     0.000 V= 0.0  TF=1019.3  TM= 557.0  BOR=1800.0                                        
+
+                                                   P0-SCATTERING
+ FROM GROUP  1
+  5.94761E-01  1.09932E-02
+ FROM GROUP  2
+  3.04319E-03  1.24979E+00
+
+ RFH  AVERAGED CROSS SECTIONS
+ ****************************
+
+ GROUP    ABSORPTION       CAPTURE       FISSION    NU-FISSION     TRANSPORT   OUT-SCATTER   DIFF(1/3TR)
+     1   1.79923E-03   1.79923E-03   0.00000E+00   0.00000E+00   2.36152E-01   1.87435E-02   1.41152E+00
+     2   4.88802E-02   4.88802E-02   0.00000E+00   0.00000E+00   1.11949E+00   2.51400E-03   2.97755E-01
+--

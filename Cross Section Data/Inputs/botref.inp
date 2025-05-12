@@ -1,0 +1,56 @@
+* ------------------------------------------------------*
+*                   SMR PWR MODEL                       *
+* ------------------------------------------------------*
+
+TTL * GENERIC NuScale MODEL - PWR BOTTOM REFLECTOR
+
+************ INVARIANT DATA **************
+PDE 65 'KWL' 
+PRE 127.6 
+TFU 1019.261 
+TMO 557
+PWR 17 1.26  21.50
+PIN 1   0.410   0.417   0.475 * FUEL PIN 
+******************************************
+
+
+***** SEGMENT SPECIFIC
+*      SEGNAME    ENR  EBA BAP BAO 
+SIM, 'BOTREF' 
+FUE 1, 10.289 / 3.50
+
+LPI
+2
+1  1
+1  1  1
+3  1  1  3
+1  1  1  1  1
+1  1  1  1  1  3  
+3  1  1  3  1  1  1  
+1  1  1  1  1  1  1  1
+1  1  1  1  1  1  1  1  1
+*****
+
+***** STANDARD MECHANICAL DESIGN SPECIFIC *********
+PIN 2  0.573   0.613  / 'MOD'    'BOX'  * INSTR TUBE
+PIN 3  0.573   0.613 /  'MOD'    'BOX'  * GUIDE TUBE
+
+SPA 14.574,,, 8.14 / 718=79.55  347=20.45  * SPACER 
+****************************************************
+
+
+BOR, 0 200 400 600 800 1000 1200 1400 1800
+
+*
+* Region 1 volumes are .74% Steel 74.5% Moderator 24.4% Zircaloy
+* Region 2 volumes are 29.08% Steel 70.92% Moderator
+* Region 3 volumes are 62.04% Steel 37.96% Moderator
+*
+
+HO1 'CRS' =  0.0074 'COO' = .745  'BOX' = .244
+HO2 'CRS' = .291 'COO' = .709
+HO3 'CRS' = .624 'COO' = .380
+
+REF,3.82,7.0,5.0/'HO1' 'HO2' 'HO3'///'BOT'
+S3C 'HOT'
+END
