@@ -490,32 +490,56 @@ def normalize_and_plot(flux1, flux2, core_map, power_MW, assembly_dim_cm, fuel_h
     plt.tight_layout()
     plt.show()
 
-    # === Axial Flux Plot Along Middle Column (Y Direction) ===
-    # === 1D Line Plots Along Middle Column ===
-    middle_col_flux = [row[4] for row in flux_map]   # middle column (X = 4)
-    middle_col_power = [row[4] for row in power_map]
-    y = list(range(len(middle_col_flux)))  # Y assembly indices
+    # === Axial Flux Plot Along Middle Column (Z Direction) ===
+    # === Axial Flux Plot Along Middle Column ===
+    mid_i = 45
+    mid_j = 45
+    axial_flux = []
+    axial_power = []
 
-    # Line plot for flux
+    for k in range(0, 30):  # loop over all axial layers
+        flat_idx = mid_i + 90 * mid_j + 90 * 90 * k
+        entry = core_map[mid_i, mid_j, k]
+        mat = entry[0]
+        tf = float(entry[1])
+        tm = float(entry[2])
+        bor = float(entry[3])
+        dep = float(entry[4])
+
+        xs1 = grand_xs_library[mat].get(tf, tm, bor, dep, 1.0)
+        xs2 = grand_xs_library[mat].get(tf, tm, bor, dep, 2.0)
+
+        sigf1 = xs1["FISSION"]
+        sigf2 = xs2["FISSION"]
+
+        phi1 = flux1[flat_idx]
+        phi2 = flux2[flat_idx]
+        total_flux = phi1 + phi2
+        total_power = (phi1 * sigf1 + phi2 * sigf2) * node_vol_cm3 * energy_per_fission
+
+        axial_flux.append(total_flux)
+        axial_power.append(total_power)
+
+    # Plot axial flux
     plt.figure()
-    plt.plot(y, middle_col_flux, marker='o')
-    plt.title("Flux Along Middle Column (X = 4)")
-    plt.xlabel("Y Assembly Index")
+    plt.plot(range(0, 30), axial_flux, marker='s')
+    plt.title("Axial Flux Along Central Column (i=45, j=45)")
+    plt.xlabel("Z Node Index")
     plt.ylabel("Flux")
     plt.grid(True)
     plt.tight_layout()
     plt.show()
 
-    # Line plot for power
+    # Plot axial power
     plt.figure()
-    plt.plot(y, middle_col_power, marker='o', color='r')
-    plt.title("Power Along Middle Column (X = 4)")
-    plt.xlabel("Y Assembly Index")
+    plt.plot(range(0, 30), axial_power, marker='s', color='orange')
+    plt.title("Axial Power Along Central Column (i=45, j=45)")
+    plt.xlabel("Z Node Index")
     plt.ylabel("Power (W)")
     plt.grid(True)
     plt.tight_layout()
     plt.show()
-    
+
 def bisection_boron(core_name, assembly_map, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim, thermal_power, tol=1e-6, max_iter=100):
     """
     Perform bisection to adjust boron concentration to achieve critical k_eff (k_eff ≈ 1.0).
