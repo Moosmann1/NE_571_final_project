@@ -530,7 +530,7 @@ def bisection_boron(core_name, assembly_map, assembly_ij_dim, fuel_k_dim, bottom
     """
     # Initial boron bounds
     boron_low = 600  # ppm
-    boron_high = 1000  # ppm (example upper bound)
+    boron_high = 1800  # ppm (example upper bound)
     boron_critical = None
 
     # Initialize CoreBuilder
@@ -716,8 +716,14 @@ thermal_power = 160       # MWt https://www.nrc.gov/docs/ML2022/ML20224A492.pdf
 #     fuel_height_cm=fuel_k_dim          # axial height of fuel
 # )
 
-core_NuScale_eq = CoreBuilder.core_maker("core_map_NuScale_eq") # checkered 4.05 and 4.55
+core_NuScale_1800 = CoreBuilder.core_maker("core_map_NuScale_1800") # NuScale design at 1800 ppm
 
+A1_Nuscale_1800, A2_Nuscale_1800, B1_fast_fission_Nuscale_1800, B1_thermal_fission_Nuscale_1800, B2_Nuscale_1800 = matrix(
+    grand_xs_library, core_NuScale_1800, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim
+    )
+k_Nuscale_1800, flux1_Nuscale_1800, flux2_Nuscale_1800 = fluxsearch(
+    A1_Nuscale_1800, A2_Nuscale_1800, B1_fast_fission_Nuscale_1800, B1_thermal_fission_Nuscale_1800, B2_Nuscale_1800)
+print(f"Final k-effective: {k_Nuscale_1800:.6f}")
 # A1_NuScale_eq, A2_NuScale_eq, B1_fast_fission_NuScale_eq, B1_thermal_fission_NuScale_eq, B2_NuScale_eq = matrix(
 #     core_NuScale_eq, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim
 # )
@@ -761,12 +767,15 @@ core_map_NuScale_eq = [
 ]
 
 # === Bisection to find critical boron concentration ===
-boron_critical, k_eff = bisection_boron(
-    core_name="core_map_NuScale_eq_crit_search",
-    assembly_map=core_map_NuScale_eq,
-    assembly_ij_dim=assembly_ij_dim,
-    fuel_k_dim=fuel_k_dim,
-    bottom_ref_k_dim=bottom_ref_k_dim,
-    top_ref_k_dim=top_ref_k_dim,
-    thermal_power=thermal_power
-)
+time_start = time.time()
+# boron_critical, k_eff = bisection_boron(
+#     core_name="core_map_NuScale_eq_crit_search",
+#     assembly_map=core_map_NuScale_eq,
+#     assembly_ij_dim=assembly_ij_dim,
+#     fuel_k_dim=fuel_k_dim,
+#     bottom_ref_k_dim=bottom_ref_k_dim,
+#     top_ref_k_dim=top_ref_k_dim,
+#     thermal_power=thermal_power
+# )
+time_end = time.time()
+print(f"Time taken for crit search: {time_end - time_start:.2f} seconds")

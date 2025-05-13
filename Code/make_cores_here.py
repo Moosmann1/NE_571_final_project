@@ -32,16 +32,16 @@ core_map_checker = [
 ]
 
 core_map_NuScale_eq = [ 
-    ['rad', 0], ['rad', 0],        ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],        ['rad', 0],
-    ['rad', 0], ['rad', 0],        ['rad', 0],         ['NUu405c00', 0],   ['NUu455c50', 15],  ['NUu405c00', 0],   ['rad', 0],         ['rad', 0],        ['rad', 0],
-    ['rad', 0], ['rad', 0],        ['NUu455c50', 0],   ['NUu405c00', 15],  ['NUu405c00', 30],  ['NUu405c00', 15],  ['NUu455c50', 0],   ['rad', 0],        ['rad', 0],
-    ['rad', 0], ['NUu405c00', 0],  ['NUu405c00', 15],  ['NUu455c50', 30],  ['NUu405c00', 30],  ['NUu455c50', 30],  ['NUu405c00', 15],  ['NUu405c00', 0],  ['rad', 0],
-    ['rad', 0], ['NUu455c50', 15], ['NUu405c00', 30],  ['NUu405c00', 30],  ['NUu260c00', 0],   ['NUu405c00', 30],  ['NUu405c00', 30],  ['NUu455c50', 15], ['rad', 0],
-    ['rad', 0], ['NUu405c00', 0],  ['NUu405c00', 15],  ['NUu455c50', 30],  ['NUu405c00', 30],  ['NUu455c50', 30],  ['NUu405c00', 15],  ['NUu405c00', 0],  ['rad', 0],
-    ['rad', 0], ['rad', 0],        ['NUu455c50', 0],   ['NUu405c00', 15],  ['NUu405c00', 30],  ['NUu405c00', 15],  ['NUu455c50', 0],   ['rad', 0],        ['rad', 0],
-    ['rad', 0], ['rad', 0],        ['rad', 0],         ['NUu405c00', 0],   ['NUu455c50', 15],  ['NUu405c00', 0],   ['rad', 0],         ['rad', 0],        ['rad', 0],
-    ['rad', 0], ['rad', 0],        ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],        ['rad', 0],
-]
+    ['rad', 0], ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],
+    ['rad', 0], ['rad', 0],         ['rad', 0],         ['NUu405c00', 0],   ['NUu455c50', 17.5],['NUu405c00', 0],   ['rad', 0],         ['rad', 0],         ['rad', 0],
+    ['rad', 0], ['rad', 0],         ['NUu455c50', 0],   ['NUu405c00', 17.5],['NUu405c00', 35],  ['NUu405c00', 17.5],['NUu455c50', 0],   ['rad', 0],         ['rad', 0],
+    ['rad', 0], ['NUu405c00', 0],   ['NUu405c00', 17.5],['NUu455c50', 35],  ['NUu405c00', 35],  ['NUu455c50', 35],  ['NUu405c00', 17.5],['NUu405c00', 0],   ['rad', 0],
+    ['rad', 0], ['NUu455c50', 17.5],['NUu405c00', 35],  ['NUu405c00', 35],  ['NUu260c00', 0],   ['NUu405c00', 35],  ['NUu405c00', 35],  ['NUu455c50', 17.5],['rad', 0],
+    ['rad', 0], ['NUu405c00', 0],   ['NUu405c00', 17.5],['NUu455c50', 35],  ['NUu405c00', 35],  ['NUu455c50', 35],  ['NUu405c00', 17.5],['NUu405c00', 0],   ['rad', 0],
+    ['rad', 0], ['rad', 0],         ['NUu455c50', 0],   ['NUu405c00', 17.5],['NUu405c00', 35],  ['NUu405c00', 17.5],['NUu455c50', 0],   ['rad', 0],         ['rad', 0],
+    ['rad', 0], ['rad', 0],         ['rad', 0],         ['NUu405c00', 0],   ['NUu455c50', 17.5],['NUu405c00', 0],   ['rad', 0],         ['rad', 0],         ['rad', 0],
+    ['rad', 0], ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],
+]  # change to 17.5 and 35 for once and twice burned
 
 assembly_only = [
     ['NUu260c00', 0]
@@ -49,7 +49,7 @@ assembly_only = [
 
 ### run config_maker below. Comment out when done to avoid overwriting the config files
 
-CoreBuilder.config_maker("core_map_NuScale_eq", core_map_NuScale_eq, 1019.3, 557, 600)  
+CoreBuilder.config_maker("core_map_NuScale_eq_longer_burn", core_map_NuScale_eq, 1019.3, 557, 600)  
 
 
 
