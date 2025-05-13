@@ -41,7 +41,7 @@ core_map_NuScale_eq = [
     ['rad', 0], ['rad', 0],         ['NUu455c50', 0],   ['NUu405c00', 17.5],['NUu405c00', 35],  ['NUu405c00', 17.5],['NUu455c50', 0],   ['rad', 0],         ['rad', 0],
     ['rad', 0], ['rad', 0],         ['rad', 0],         ['NUu405c00', 0],   ['NUu455c50', 17.5],['NUu405c00', 0],   ['rad', 0],         ['rad', 0],         ['rad', 0],
     ['rad', 0], ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],
-]  # change to 17.5 and 35 for once and twice burned
+] 
 
 assembly_only = [
     ['NUu260c00', 0]
