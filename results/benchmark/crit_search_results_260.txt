@@ -1,0 +1,10 @@
+Iteration 13: Boron = 1733.40 ppm, k_eff = 0.999996
+Critical boron concentration found: 1733.40 ppm, k_eff = 0.999996
+Time taken for crit search: 2191.28 seconds
+
+---------
+FROM SIMULATE:
+
+BOC critical boron concentration 1404 ppm. 
+
+delta of 329.4 ppm

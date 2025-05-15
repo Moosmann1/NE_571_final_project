@@ -1,0 +1,3 @@
+ran at 1800 ppm boron. 
+used "core_map_checker_1800.txt"
+

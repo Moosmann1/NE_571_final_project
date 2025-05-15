@@ -1,0 +1,50 @@
+Cannot interpolate for BOR=775.0 ppm in material NUu455c50 for BURNUP=16.5, TF=1019.3, TM=557.0, GROUP=1.
+Cannot interpolate for BOR=775.0 ppm in material NUu455c50 for BURNUP=16.5, TF=1019.3, TM=557.0, GROUP=2.
+[0.01895194 0.01895194 0.01895194 ... 0.01841797 0.01841797 0.01841797]
+Time taken to create matrix: 3.82 seconds
+Time taken to find k: 164.82 seconds
+Iteration 1: Boron = 775.00 ppm, k_eff = 0.999387
+Cannot interpolate for BOR=762.5 ppm in material NUu455c50 for BURNUP=16.5, TF=1019.3, TM=557.0, GROUP=1.
+Cannot interpolate for BOR=762.5 ppm in material NUu455c50 for BURNUP=16.5, TF=1019.3, TM=557.0, GROUP=2.
+[0.01895451 0.01895451 0.01895451 ... 0.01842056 0.01842056 0.01842056]
+Time taken to create matrix: 3.72 seconds
+Time taken to find k: 162.08 seconds
+Iteration 2: Boron = 762.50 ppm, k_eff = 1.000504
+Cannot interpolate for BOR=768.75 ppm in material NUu455c50 for BURNUP=16.5, TF=1019.3, TM=557.0, GROUP=1.
+Cannot interpolate for BOR=768.75 ppm in material NUu455c50 for BURNUP=16.5, TF=1019.3, TM=557.0, GROUP=2.
+[0.01895322 0.01895322 0.01895322 ... 0.01841927 0.01841927 0.01841927]
+Time taken to create matrix: 4.00 seconds
+Time taken to find k: 161.71 seconds
+Iteration 3: Boron = 768.75 ppm, k_eff = 0.999944
+Cannot interpolate for BOR=765.625 ppm in material NUu455c50 for BURNUP=16.5, TF=1019.3, TM=557.0, GROUP=1.
+Cannot interpolate for BOR=765.625 ppm in material NUu455c50 for BURNUP=16.5, TF=1019.3, TM=557.0, GROUP=2.
+[0.01895386 0.01895386 0.01895386 ... 0.01841992 0.01841992 0.01841992]
+Time taken to create matrix: 3.63 seconds
+Time taken to find k: 162.09 seconds
+Iteration 4: Boron = 765.62 ppm, k_eff = 1.000224
+Cannot interpolate for BOR=767.1875 ppm in material NUu455c50 for BURNUP=16.5, TF=1019.3, TM=557.0, GROUP=1.
+Cannot interpolate for BOR=767.1875 ppm in material NUu455c50 for BURNUP=16.5, TF=1019.3, TM=557.0, GROUP=2.
+[0.01895354 0.01895354 0.01895354 ... 0.01841959 0.01841959 0.01841959]
+Time taken to create matrix: 3.64 seconds
+Time taken to find k: 161.37 seconds
+Iteration 5: Boron = 767.19 ppm, k_eff = 1.000084
+Cannot interpolate for BOR=767.96875 ppm in material NUu455c50 for BURNUP=16.5, TF=1019.3, TM=557.0, GROUP=1.
+Cannot interpolate for BOR=767.96875 ppm in material NUu455c50 for BURNUP=16.5, TF=1019.3, TM=557.0, GROUP=2.
+[0.01895338 0.01895338 0.01895338 ... 0.01841943 0.01841943 0.01841943]
+Time taken to create matrix: 3.67 seconds
+Time taken to find k: 160.99 seconds
+Iteration 6: Boron = 767.97 ppm, k_eff = 1.000014
+Cannot interpolate for BOR=768.359375 ppm in material NUu455c50 for BURNUP=16.5, TF=1019.3, TM=557.0, GROUP=1.
+Cannot interpolate for BOR=768.359375 ppm in material NUu455c50 for BURNUP=16.5, TF=1019.3, TM=557.0, GROUP=2.
+[0.0189533  0.0189533  0.0189533  ... 0.01841935 0.01841935 0.01841935]
+Time taken to create matrix: 3.63 seconds
+Time taken to find k: 160.89 seconds
+Iteration 7: Boron = 768.36 ppm, k_eff = 0.999979
+Cannot interpolate for BOR=768.1640625 ppm in material NUu455c50 for BURNUP=16.5, TF=1019.3, TM=557.0, GROUP=1.
+Cannot interpolate for BOR=768.1640625 ppm in material NUu455c50 for BURNUP=16.5, TF=1019.3, TM=557.0, GROUP=2.
+[0.01895334 0.01895334 0.01895334 ... 0.01841939 0.01841939 0.01841939]
+Time taken to create matrix: 3.61 seconds
+Time taken to find k: 161.41 seconds
+Iteration 8: Boron = 768.16 ppm, k_eff = 0.999996
+Critical boron concentration found: 768.16 ppm, k_eff = 0.999996
+Time taken for crit search: 1328.63 seconds

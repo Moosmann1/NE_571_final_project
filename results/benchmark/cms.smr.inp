@@ -1,0 +1,23 @@
+'NEW' 'cms.smr.lib'/
+
+'CAS' 'NUu260c00.cax' 'NUu260c00'/
+'STA'/
+
+'CAS' 'NUu405c00.cax' 'NUu405c00'/
+'STA'/
+
+'CAS' 'NUu455c50_Corrected.cax' 'NUu455c50'/
+'STA'/
+
+'CAS' 'radref.cax' , , 0 'RAD'/
+'STA'/
+
+'CAS','topref.cax' , , 0 'TOP'/
+'STA'/
+
+'CAS','botref.cax' , , 0 'BOT'/                                                                
+'STA'/
+
+'END'/
+
+

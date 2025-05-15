@@ -1,0 +1,142 @@
+'COM'  * --------------------------------------------*
+'COM'  *                                             *
+'COM'  *              MOCK SMR PWR MODEL             *
+'COM'  *                 UO2 DESIGN                  *
+'COM'  *                C Y C L E    1               *
+'COM'  *                                             *
+'COM'  * --------------------------------------------*
+
+
+'DIM.PWR' 7/                                      * PWR with 7 rows of fuel assemblies
+'DIM.CAL' 8, 2/                                   * 8 axial nodes in the fuel, Quarter core
+'DIM.DEP' 'EXP' 'SAM' 'HBOR' 'HTMO' 'HTF'  'PIN' 'EBP' /  * Select depletion arguments
+
+'COR.DAT' 21.50, 200, 37, 232.4, 543/     * core data given above
+'COR.SYM' 'MIR'/                                  * Core symmetry
+
+'TIT.CAS' 'PWR CYCLE 1 NuScale CORE - NOMINAL CYCLE'/      * Title for each case in run
+'TIT.PRO' 'NE_571 workshop example'/        * Project name
+
+'COM' SPECIFY THE REFLECTOR LOCATIONS
+'FUE.TYP' 1
+  0   0   0   0   1 
+  0   0   0   0   1 
+  0   0   0   1       0
+  0   0   1         2*0
+  1   1   1         2*0/            
+
+'COM'  LOADING PATTERN
+
+
+'FUE.SER' 3/                                  * Fuel assembly serial numbers in Full-core map
+ 1  1         A01 B01 A02
+ 2  1     A03 B02 A04 B03 A05
+ 3  1 A06 B04 A07 B05 A08 B06 A09
+ 4  1 B07 A10 B08 A11 B09 A12 B10
+ 5  1 A13 B11 A14 B12 A15 B13 A16
+ 6  1     A17 B14 A18 B15 A19 
+ 7  1         A20 B16 A21   
+ 0  0
+
+'COM'               SERIAL   NUMBER TO    FUEL    BATCH
+'COM'               LABEL     CREATE      TYPE   NUMBER
+'FUE.NEW' 'TYPE01', 'A01',      21,        4,    ,,1/
+'FUE.NEW' 'TYPE02', 'B01',      16,        4,    ,,1/
+
+'RES' 'NEWFUEL'/                                  * Load fue.new data
+
+
+'LIB' 'cms.smr.lib'/    * Library created by CMSLINK
+
+'REF.LIB'  01 'RADREF'/             * Reflector composition: Link segment name 'RADREF'in the CMSLINK library 
+'REF.LIB'  02 'TOPREF'/ 
+'REF.LIB'  03 'BOTREF'/
+
+'COM' Fuel composition: same as for reflector case
+'SEG.LIB'  04 'NUu260c00'/          
+'SEG.DAT'  04 2.60, 0.0, 0, 0/
+
+'FUE.ZON'  01, 1, 'RADIALREF'   3,0.0  1,200  2/
+'FUE.ZON'  04, 1, 'NUu405c00'   3,0.0  4,200  2/
+
+
+'BAT.LAB'  1,'CYC-1' /
+'BAT.EDT' 'ON' 'ARPF' 'AEXP' 'AKIN' '3PIN' '3XPO' /
+
+'COM' GENERIC MODEL:  FUEL TEMPERATURE CALC                                       
+
+'SEG.TFU', 0,    0.0,  217.0,   17.0/            * Segment fuel temperature fit calculated by INTERPIN
+
+'COM' EXPOSURE IN GWD/MT
+
+'TAB.TFU'   1, 0, 'EXP', 8, 'POW',      1
+           0.0    5.0   10.0   15.0   20.0   30.0   40.0   50.0
+   1.0,   68.2   23.7   3.4    0.0   -1.6   -0.9   -0.6   -2.1/                 
+
+'SEG.GRD' 0 'GRD' 0.928 1.074/                   * Grid cross-section data
+
+'FUE.GRD' 'ON'  5.00  4.445 'GRD'
+			   47.50  4.445 'GRD'
+			  100.00  4.445 'GRD'
+			  142.50  4.445 'GRD'
+			  195.00  4.445 'GRD' /               * Explicit spacer (grid) modeling
+
+'COM' CONTROL RODS
+'COM' BANK   D  C  B  A  SA  SB
+'COM'  #     1  2  3  4  5   6
+'CRD.GRP' 1
+2*0          0   1   0           2*0
+  0      0   1   0   1   0         0
+     0   1   0   1   0   1   0
+     1   0   1   0   1   0   1
+     0   1   0   1   0   1   0
+  0      0   1   0   1   0         0
+2*0          0   1   0           2*0/
+
+'CRD.DAT' 130, 1.5/                            * Control rod position and centimeters per step
+'CRD.ZON' 1,1, 'AGINCD' 0, 5 10,200/       * 0 - uncontrolled region
+                                                  
+'HYD.ITE'/                                       * Hydraulic iteration
+
+'ITE.BOR' 600 /                                   * Soluble boron criticality search
+
+'COM' 'ITE.KEF' 1.00 /
+
+'DEP.CYC' 'CYCLE01' 0.0,01 /              * Initialize cycle exposure and the starting date for the cycle
+
+'PIN.EDT' 'ON' 'SUMM' '2PIN' '2PLO' /            * Execute the pin reconstr. and edit given parameters in sum. list
+
+'COR.OPE' 100.0, 100.0, 1850/                    * Set core operating power, flow and pressure
+'COR.TIN' 497.0/                                 * Set core inlet temperature
+
+'DEP.STA' 'AVE' 0.0 0.15 0.5 1 2 -2 30 /
+
+'COM'
+'COM'             SRC PRMA   START VAL    EPS    GRP  PAS  TRGT  TRVAL  TREPS     TRG
+'COM'                         (STEPS)   (STEPS)
+'COM'                 v         v        v        v    v    v      v      v        v
+'COM' -----------+----------+--------+--------+------+----+-----+------+--------+------+
+'ITE.SRC'  'SET'    'EOLEXP' ,        ,   0.02 ,      ,    ,     ,      ,        , 'MINBOR' 
+      10         ,          ,        ,        ,      , 4  ,  4  ,      ,        ,      /
+'COM' -----------+----------+--------+--------+------+----+-----+------+--------+------+
+'COM'                 ^         ^        ^        ^     ^    ^     ^      
+'COM'              TRGVAL      SP1      SP2      SP3  SP4   SP5   SP6    
+'COM'
+'COM' SP1 = search var initial perturbation
+'COM' SP2 = search var maximum change between successive cases
+'COM' SP3 = search var minimum change between successive cases
+'COM' SP4 = search var maximum value allowed
+'COM' SP5 = search var number of iterations before search begins
+'COM' SP6 = search var number of iterations for each search cases
+'COM' SP7 = search var initial perturbation
+
+'FUE.INI','JILAB'/
+
+'PRI.STA' '2EXP' '2RPF' /
+
+'WRE' 's3.nu.c01.res' 0.0 8.0 20000 /       * Save results at given exposure values
+
+'CMS.EDT' 'ON' '2EXP' '3EXP'  '3RPF' '3PIN' '2PIN'  /
+
+'STA'/
+'END'/
