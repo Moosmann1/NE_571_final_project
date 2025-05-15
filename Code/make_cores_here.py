@@ -49,7 +49,7 @@ assembly_only = [
 
 ### run config_maker below. Comment out when done to avoid overwriting the config files
 
-CoreBuilder.config_maker("core_map_NuScale_eq_longer_burn", core_map_NuScale_eq, 1019.3, 557, 600)  
+CoreBuilder.config_maker("core_map_checker_1800", core_map_checker, 1019.3, 557, 1800)  
 
 
 

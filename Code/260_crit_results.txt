@@ -1,0 +1,56 @@
+Boron value 1000.0 ppm already exists for material NUu260c00. Skipping interpolation.
+Boron value 1000.0 ppm already exists for material NUu405c00. Skipping interpolation.
+Boron value 1000.0 ppm already exists for material NUu455c50. Skipping interpolation.
+Boron value 1000.0 ppm already exists for material rad. Skipping interpolation.
+Boron value 1000.0 ppm already exists for material BOTREF. Skipping interpolation.
+Boron value 1000.0 ppm already exists for material TOPREF. Skipping interpolation.
+Time taken to create matrix: 3.72 seconds
+Time taken to find k: 164.21 seconds
+Iteration 1: Boron = 1000.00 ppm, k_eff = 1.082429
+Boron value 1400.0 ppm already exists for material NUu260c00. Skipping interpolation.
+Boron value 1400.0 ppm already exists for material NUu405c00. Skipping interpolation.
+Boron value 1400.0 ppm already exists for material NUu455c50. Skipping interpolation.
+Boron value 1400.0 ppm already exists for material rad. Skipping interpolation.
+Boron value 1400.0 ppm already exists for material BOTREF. Skipping interpolation.
+Boron value 1400.0 ppm already exists for material TOPREF. Skipping interpolation.
+Time taken to create matrix: 3.79 seconds
+Time taken to find k: 165.50 seconds
+Iteration 2: Boron = 1400.00 ppm, k_eff = 1.035118
+Boron value 1600.0 ppm already exists for material NUu260c00. Skipping interpolation.
+Boron value 1600.0 ppm already exists for material NUu405c00. Skipping interpolation.
+Boron value 1600.0 ppm already exists for material NUu455c50. Skipping interpolation.
+Time taken to create matrix: 3.94 seconds
+Time taken to find k: 163.86 seconds
+Iteration 3: Boron = 1600.00 ppm, k_eff = 1.013154
+Time taken to create matrix: 3.86 seconds
+Time taken to find k: 169.14 seconds
+Iteration 4: Boron = 1700.00 ppm, k_eff = 1.002591
+Time taken to create matrix: 3.82 seconds
+Time taken to find k: 164.41 seconds
+Iteration 5: Boron = 1750.00 ppm, k_eff = 0.997398
+Time taken to create matrix: 3.82 seconds
+Time taken to find k: 166.66 seconds
+Iteration 6: Boron = 1725.00 ppm, k_eff = 0.999987
+Time taken to create matrix: 3.86 seconds
+Time taken to find k: 165.45 seconds
+Iteration 7: Boron = 1712.50 ppm, k_eff = 1.001288
+Time taken to create matrix: 3.70 seconds
+Time taken to find k: 162.48 seconds
+Iteration 8: Boron = 1718.75 ppm, k_eff = 1.000637
+Time taken to create matrix: 3.63 seconds
+Time taken to find k: 155.64 seconds
+Iteration 9: Boron = 1721.88 ppm, k_eff = 1.000312
+Time taken to create matrix: 3.62 seconds
+Time taken to find k: 157.00 seconds
+Iteration 10: Boron = 1723.44 ppm, k_eff = 1.000150
+Time taken to create matrix: 3.68 seconds
+Time taken to find k: 156.15 seconds
+Iteration 11: Boron = 1724.22 ppm, k_eff = 1.000069
+Time taken to create matrix: 3.73 seconds
+Time taken to find k: 157.79 seconds
+Iteration 12: Boron = 1724.61 ppm, k_eff = 1.000028
+Time taken to create matrix: 3.82 seconds
+Time taken to find k: 155.37 seconds
+Iteration 13: Boron = 1724.80 ppm, k_eff = 1.000008
+Critical boron concentration found: 1724.80 ppm, k_eff = 1.000008
+Time taken for crit search: 2158.68 seconds

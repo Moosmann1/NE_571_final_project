@@ -292,7 +292,7 @@ def matrix(grand_library, core_map, assembly_ij_dim, fuel_k_dim, bottom_ref_k_di
 
     # Thermal B matrix
     B2 = diags([central_B2], [0], format="csc")
-    
+    print(central_B2)
     # time to make the matrix
     end_time = time.time()
     print(f"Time taken to create matrix: {end_time - start_time:.2f} seconds")
@@ -407,6 +407,11 @@ def normalize_and_plot(flux1, flux2, core_map, power_MW, assembly_dim_cm, fuel_h
     norm_factor = total_power_W / raw_total_power
     flux_map = (np.array(flux_map) * norm_factor).tolist()
     power_map = (np.array(power_map) * norm_factor).tolist()
+    
+    # calculate RPF
+    core_average_power = np.sum(power_map) / (37) #37 assemblies, power in reflector is 0
+    radial_peaking_map = power_map / core_average_power
+    radial_peaking_map = np.array(radial_peaking_map)
 
     # === Plot Flux Map ===
     plt.figure(figsize=(7, 6))
@@ -418,13 +423,21 @@ def normalize_and_plot(flux1, flux2, core_map, power_MW, assembly_dim_cm, fuel_h
     plt.tight_layout()
     plt.show()
 
-    # === Plot Power Map ===
+    # === Plot Power Map with Radial Peaking Factors ===
     plt.figure(figsize=(7, 6))
     plt.imshow(power_map, cmap='inferno')
-    plt.title("Average Assembly Power (W)")
+    plt.title("Average Assembly Power (W) with Radial Peaking Factors")
     plt.xlabel("X Assembly Index")
     plt.ylabel("Y Assembly Index")
     plt.colorbar(label="Power (W)")
+
+    # Add RPF values as text annotations, skipping 'rad' assemblies
+    for i in range(len(radial_peaking_map)):
+        for j in range(len(radial_peaking_map[i])):
+            if core_map[i*10][j*10][10][0] != 'rad':  # Check if the assembly is not 'rad'
+                rpf_value = radial_peaking_map[i, j]
+                plt.text(j, i, f"{rpf_value:.2f}", ha='center', va='center', color='black', fontsize=8)
+
     plt.tight_layout()
     plt.show()
 
@@ -477,24 +490,40 @@ def normalize_and_plot(flux1, flux2, core_map, power_MW, assembly_dim_cm, fuel_h
 
         phi1 = flux1[flat_idx]
         phi2 = flux2[flat_idx]
-        total_flux = phi1 + phi2
-        total_power = (phi1 * sigf1 + phi2 * sigf2) * node_vol_cm3 * energy_per_fission
+        total_flux = (phi1 + phi2) * norm_factor
+        total_power = ((phi1 * sigf1 + phi2 * sigf2) * node_vol_cm3 * energy_per_fission) * norm_factor
 
         axial_flux.append(total_flux)
         axial_power.append(total_power)
 
-    # Plot axial flux
-    dr_bottom_ref = bottom_ref_k_dim / 5
-    dr_fuel = fuel_k_dim / 10
-    dr_top_ref = top_ref_k_dim / 5
-    physical_steps = [0, 1*dr_bottom_ref, 2*dr_bottom_ref, 3*dr_bottom_ref, 4*dr_bottom_ref,5*dr_fuel, 6*dr_fuel, 7*dr_fuel, 8*dr_fuel, 9*dr_fuel, 10*dr_fuel, 11*dr_fuel, 12*dr_fuel, 13*dr_fuel, 14*dr_fuel, 15*dr_top_ref, 16*dr_top_ref, 17*dr_top_ref, 18*dr_top_ref, 19*dr_top_ref]
-    
+    # Calculate step sizes for each region
+    dr_bottom_ref = bottom_ref_k_dim / 5  # 5 nodes in bottom reflector
+    dr_fuel = fuel_height_cm / 10            # 10 nodes in fuel region
+    dr_top_ref = top_ref_k_dim / 5       # 5 nodes in top reflector
+
+    # Create an array for the physical height of each axial node
+    physical_heights = []
+
+    # Add heights for bottom reflector nodes
+    for i in range(5):
+        physical_heights.append(i * dr_bottom_ref)
+
+    # Add heights for fuel region nodes
+    for i in range(10):
+        physical_heights.append(5 * dr_bottom_ref + i * dr_fuel)
+
+    # Add heights for top reflector nodes
+    for i in range(5):
+        physical_heights.append(5 * dr_bottom_ref + 10 * dr_fuel + i * dr_top_ref)
+
+    # Plot axial flux relative to physical height
     plt.figure()
-    plt.plot(physical_steps, axial_flux, marker='s')
+    plt.plot(physical_heights, axial_flux, marker='s', label="Axial Flux")
     plt.title("Axial Flux Along Central Column (i=45, j=45)")
-    plt.xlabel("Z Node Index")
+    plt.xlabel("Physical Height (cm)")
     plt.ylabel("Flux")
     plt.grid(True)
+    plt.legend()
     plt.tight_layout()
     plt.show()
 
@@ -652,9 +681,9 @@ top_ref_k_dim = 9.02      # cm (height of top reflector) (3.551 in) https://www.
 thermal_power = 160       # MWt https://www.nrc.gov/docs/ML2022/ML20224A492.pdf
 
 # # === Build matrices and solve for flux and k-effective ===
-# A1, A2, B1_fast_fission, B1_thermal_fission, B2 = matrix(
-#     core_2, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim
-# )
+A1, A2, B1_fast_fission, B1_thermal_fission, B2 = matrix(
+    grand_xs_library, core_2, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim
+)
 
 # k_1, flux1_1, flux2_1 = fluxsearch(A1, A2, B1_fast_fission, B1_thermal_fission, B2)
 # print(f"Final k-effective: {k_1:.6f}")
@@ -714,7 +743,7 @@ thermal_power = 160       # MWt https://www.nrc.gov/docs/ML2022/ML20224A492.pdf
 #     fuel_height_cm=fuel_k_dim          # axial height of fuel
 # )
 
-# core_NuScale_1800 = CoreBuilder.core_maker("core_map_NuScale_1800") # NuScale design at 1800 ppm
+core_NuScale_eq = CoreBuilder.core_maker("core_map_NuScale_eq") # NuScale design at 1800 ppm
 
 # A1_Nuscale_1800, A2_Nuscale_1800, B1_fast_fission_Nuscale_1800, B1_thermal_fission_Nuscale_1800, B2_Nuscale_1800 = matrix(
 #     grand_xs_library, core_NuScale_1800, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim
@@ -725,6 +754,15 @@ thermal_power = 160       # MWt https://www.nrc.gov/docs/ML2022/ML20224A492.pdf
 # A1_NuScale_eq, A2_NuScale_eq, B1_fast_fission_NuScale_eq, B1_thermal_fission_NuScale_eq, B2_NuScale_eq = matrix(
 #     core_NuScale_eq, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim
 # )
+
+# core_checker_1800 = CoreBuilder.core_maker("core_map_checker_1800") # checkered 4.05 and 4.55
+# A1_checker_1800, A2_checker_1800, B1_fast_fission_checker_1800, B1_thermal_fission_checker_1800, B2_checker_1800 = matrix(
+#     grand_xs_library, core_checker_1800, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim
+# )
+# k_checker_1800, flux1_checker_1800, flux2_checker_1800 = fluxsearch(
+#     A1_checker_1800, A2_checker_1800, B1_fast_fission_checker_1800, B1_thermal_fission_checker_1800, B2_checker_1800
+# )
+# print(f"Final k-effective: {k_checker_1800:.6f}")
 
 # k_NuScale_eq, flux1_NuScale_eq, flux2_NuScale_eq = fluxsearch(
 #     A1_NuScale_eq, A2_NuScale_eq, B1_fast_fission_NuScale_eq, B1_thermal_fission_NuScale_eq, B2_NuScale_eq
@@ -738,19 +776,19 @@ thermal_power = 160       # MWt https://www.nrc.gov/docs/ML2022/ML20224A492.pdf
 #         flux2_file.write(f"{flux}\n")
 
 # # === Run plot routine ===
-# with open("flux1_NuScale_eq.txt", 'r') as flux1_file:
-#     lines = flux1_file.readlines()
-#     flux1_NuScale_eq = np.array([float(line.strip()) for line in lines])
-# with open("flux2_NuScale_eq.txt", 'r') as flux2_file:
-#     lines = flux2_file.readlines()
-#     flux2_NuScale_eq = np.array([float(line.strip()) for line in lines])
+with open("flux1_NuScale_eq.txt", 'r') as flux1_file:
+    lines = flux1_file.readlines()
+    flux1_NuScale_eq = np.array([float(line.strip()) for line in lines])
+with open("flux2_NuScale_eq.txt", 'r') as flux2_file:
+    lines = flux2_file.readlines()
+    flux2_NuScale_eq = np.array([float(line.strip()) for line in lines])
 
-# normalize_and_plot(
-#     flux1_NuScale_eq, flux2_NuScale_eq, core_NuScale_eq,
-#     power_MW=thermal_power,               # reactor thermal power
-#     assembly_dim_cm=assembly_ij_dim,         # XY dimension per assembly
-#     fuel_height_cm=fuel_k_dim          # axial height of fuel
-# )
+normalize_and_plot(
+    flux1_NuScale_eq, flux2_NuScale_eq, core_NuScale_eq,
+    power_MW=thermal_power,               # reactor thermal power
+    assembly_dim_cm=assembly_ij_dim,         # XY dimension per assembly
+    fuel_height_cm=fuel_k_dim          # axial height of fuel
+)
 
 core_map_NuScale_eq = [ 
     ['rad', 0], ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],
@@ -764,15 +802,15 @@ core_map_NuScale_eq = [
     ['rad', 0], ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],
 ] 
 
-core_map_checker = [
+core_map_260 = [
     ['rad', 0], ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],
-    ['rad', 0], ['rad', 0],        ['rad', 0],        ['NUu405c00', 0],  ['NUu455c50', 0],  ['NUu405c00', 0],  ['rad', 0],        ['rad', 0],        ['rad', 0],
-    ['rad', 0], ['rad', 0],        ['NUu405c00', 0],  ['NUu455c50', 0],  ['NUu405c00', 0],  ['NUu455c50', 0],  ['NUu405c00', 0],  ['rad', 0],        ['rad', 0],
-    ['rad', 0], ['NUu405c00', 0],  ['NUu455c50', 0],  ['NUu405c00', 0],  ['NUu455c50', 0],  ['NUu405c00', 0],  ['NUu455c50', 0],  ['NUu405c00', 0],  ['rad', 0],
-    ['rad', 0], ['NUu455c50', 0],  ['NUu405c00', 0],  ['NUu455c50', 0],  ['NUu405c00', 0],  ['NUu455c50', 0],  ['NUu405c00', 0],  ['NUu455c50', 0],  ['rad', 0],
-    ['rad', 0], ['NUu405c00', 0],  ['NUu455c50', 0],  ['NUu405c00', 0],  ['NUu455c50', 0],  ['NUu405c00', 0],  ['NUu455c50', 0],  ['NUu405c00', 0],  ['rad', 0],
-    ['rad', 0], ['rad', 0],        ['NUu405c00', 0],  ['NUu455c50', 0],  ['NUu405c00', 0],  ['NUu455c50', 0],  ['NUu405c00', 0],  ['rad', 0],        ['rad', 0],
-    ['rad', 0], ['rad', 0],        ['rad', 0],        ['NUu405c00', 0],  ['NUu455c50', 0],  ['NUu405c00', 0],  ['rad', 0],        ['rad', 0],        ['rad', 0],
+    ['rad', 0], ['rad', 0],        ['rad', 0],        ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['rad', 0],        ['rad', 0],        ['rad', 0],
+    ['rad', 0], ['rad', 0],        ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['rad', 0],        ['rad', 0],
+    ['rad', 0], ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['rad', 0],
+    ['rad', 0], ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['rad', 0],
+    ['rad', 0], ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['rad', 0],
+    ['rad', 0], ['rad', 0],        ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['rad', 0],        ['rad', 0],
+    ['rad', 0], ['rad', 0],        ['rad', 0],        ['NUu260c00', 0],  ['NUu260c00', 0],  ['NUu260c00', 0],  ['rad', 0],        ['rad', 0],        ['rad', 0],
     ['rad', 0], ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],
 ]
 
@@ -798,41 +836,43 @@ core_map_checker = [
 #     for flux in flux2_crit:
 #         flux2_file.write(f"{flux}\n")
 
-# == Bisection to find critical boron concentration for checkered design ===
-time_start = time.time()
-boron_critical, k_eff, flux1_crit, flux2_crit = bisection_boron(
-    core_name="core_map_checker_crit_search",
-    assembly_map=core_map_checker,
-    assembly_ij_dim=assembly_ij_dim,
-    fuel_k_dim=fuel_k_dim,
-    bottom_ref_k_dim=bottom_ref_k_dim,
-    top_ref_k_dim=top_ref_k_dim,
-)
-time_end = time.time()
-print(f"Time taken for crit search: {time_end - time_start:.2f} seconds")
+# # == Bisection to find critical boron concentration for 260 design ===
+# time_start = time.time()
+# boron_critical, k_eff, flux1_crit, flux2_crit = bisection_boron(
+#     core_name="core_map_260_crit_search",
+#     assembly_map=core_map_260,
+#     assembly_ij_dim=assembly_ij_dim,
+#     fuel_k_dim=fuel_k_dim,
+#     bottom_ref_k_dim=bottom_ref_k_dim,
+#     top_ref_k_dim=top_ref_k_dim,
+#     boron_low=200,
+#     boron_high=1800
+# )
+# time_end = time.time()
+# print(f"Time taken for crit search: {time_end - time_start:.2f} seconds")
 
-with open("flux1_checker_crit.txt", 'w') as flux1_file:
-    for flux in flux1_crit:
-        flux1_file.write(f"{flux}\n")
-with open("flux2_checker_crit.txt", 'w') as flux2_file:
-    for flux in flux2_crit:
-        flux2_file.write(f"{flux}\n")
+# with open("flux1_260_crit.txt", 'w') as flux1_file:
+#     for flux in flux1_crit:
+#         flux1_file.write(f"{flux}\n")
+# with open("flux2_260_crit.txt", 'w') as flux2_file:
+#     for flux in flux2_crit:
+#         flux2_file.write(f"{flux}\n")
 
         
-# === Run plot routine ===
-with open("flux1_checker_crit.txt", 'r') as flux1_file:
-    lines = flux1_file.readlines()
-    flux1_crit = np.array([float(line.strip()) for line in lines])
-with open("flux2_checker_crit.txt", 'r') as flux2_file:
-    lines = flux2_file.readlines()
-    flux2_crit = np.array([float(line.strip()) for line in lines])
+# # === Run plot routine ===
+# with open("flux1_260_crit.txt", 'r') as flux1_file:
+#     lines = flux1_file.readlines()
+#     flux1_crit = np.array([float(line.strip()) for line in lines])
+# with open("flux2_260_crit.txt", 'r') as flux2_file:
+#     lines = flux2_file.readlines()
+#     flux2_crit = np.array([float(line.strip()) for line in lines])
 
-# interp_cx_for_graph = interpolate_xs(grand_xs_library, 758.984375)
-# core_NuScale_crit = CoreBuilder.core_maker("core_map_NuScale_eq_crit_search")
-core_checker_crit = CoreBuilder.core_maker("core_map_checker_crit_search")
-normalize_and_plot(
-    flux1_crit, flux2_crit, core_checker_crit,
-    power_MW=thermal_power,               # reactor thermal power
-    assembly_dim_cm=assembly_ij_dim,         # XY dimension per assembly
-    fuel_height_cm=fuel_k_dim          # axial height of fuel
-)
+# # interp_cx_for_graph = interpolate_xs(grand_xs_library, 758.984375)
+# # core_NuScale_crit = CoreBuilder.core_maker("core_map_NuScale_eq_crit_search")
+# core_260_crit = CoreBuilder.core_maker("core_map_260_crit_search")
+# normalize_and_plot(
+#     flux1_crit, flux2_crit, core_260_crit,
+#     power_MW=thermal_power,               # reactor thermal power
+#     assembly_dim_cm=assembly_ij_dim,         # XY dimension per assembly
+#     fuel_height_cm=fuel_k_dim          # axial height of fuel
+# )
