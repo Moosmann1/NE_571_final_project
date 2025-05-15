@@ -63,8 +63,8 @@ def matrix(grand_library, core_map, assembly_ij_dim, fuel_k_dim, bottom_ref_k_di
     
     # Calculate step sizes in the k direction for each region
     dk_bottom_ref = bottom_ref_k_dim / k_nodes_bottom_ref if k_nodes_bottom_ref > 0 else 0
-    dk_fuel = fuel_k_dim / k_nodes_fuel if k_nodes_fuel > 0 else 0
-    dk_top_ref = top_ref_k_dim / k_nodes_top_ref if k_nodes_top_ref > 0 else 0
+    dk_fuel = fuel_k_dim / (k_nodes_fuel-1) if k_nodes_fuel > 0 else 0
+    dk_top_ref = top_ref_k_dim / (k_nodes_top_ref) if k_nodes_top_ref > 0 else 0
     
     # A matrixes: the 1-D arrays that will get diagonalized
     central_fast = np.zeros(i_node_total*j_node_total*k_node_total)
@@ -95,6 +95,8 @@ def matrix(grand_library, core_map, assembly_ij_dim, fuel_k_dim, bottom_ref_k_di
                  # Determine the correct dk value based on the region
                 if core_map[i, j, k][0] == "BOTREF":
                     dk = dk_bottom_ref
+                elif core_map[i, j, k][0] == "TOPREF" and k==15:
+                    dk = dk_fuel
                 elif core_map[i, j, k][0] == "TOPREF":
                     dk = dk_top_ref
                 else:
@@ -498,7 +500,7 @@ def normalize_and_plot(flux1, flux2, core_map, power_MW, assembly_dim_cm, fuel_h
 
     # Calculate step sizes for each region
     dr_bottom_ref = bottom_ref_k_dim / 5  # 5 nodes in bottom reflector
-    dr_fuel = fuel_height_cm / 10            # 10 nodes in fuel region
+    dr_fuel = fuel_height_cm / (10-1)            # 10 nodes in fuel region
     dr_top_ref = top_ref_k_dim / 5       # 5 nodes in top reflector
 
     # Create an array for the physical height of each axial node
@@ -743,27 +745,33 @@ A1, A2, B1_fast_fission, B1_thermal_fission, B2 = matrix(
 #     fuel_height_cm=fuel_k_dim          # axial height of fuel
 # )
 
-core_NuScale_eq = CoreBuilder.core_maker("core_map_NuScale_eq") # NuScale design at 1800 ppm
-
-# A1_Nuscale_1800, A2_Nuscale_1800, B1_fast_fission_Nuscale_1800, B1_thermal_fission_Nuscale_1800, B2_Nuscale_1800 = matrix(
-#     grand_xs_library, core_NuScale_1800, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim
-#     )
-# k_Nuscale_1800, flux1_Nuscale_1800, flux2_Nuscale_1800 = fluxsearch(
-#     A1_Nuscale_1800, A2_Nuscale_1800, B1_fast_fission_Nuscale_1800, B1_thermal_fission_Nuscale_1800, B2_Nuscale_1800)
-# print(f"Final k-effective: {k_Nuscale_1800:.6f}")
+core_NuScale_all_bot = CoreBuilder.core_maker("core_map_NuScale_all_bot") # NuScale design at 1800 ppm
+interp_cx_for_graph = interpolate_xs(grand_xs_library, 750)
+A1_Nuscale_all_bot, A2_Nuscale_all_bot, B1_fast_fission_Nuscale_all_bot, B1_thermal_fission_Nuscale_all_bot, B2_Nuscale_all_bot = matrix(
+    interp_cx_for_graph, core_NuScale_all_bot, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim
+    )
+k_Nuscale_all_bot, flux1_Nuscale_all_bot, flux2_Nuscale_all_bot = fluxsearch(
+    A1_Nuscale_all_bot, A2_Nuscale_all_bot, B1_fast_fission_Nuscale_all_bot, B1_thermal_fission_Nuscale_all_bot, B2_Nuscale_all_bot)
+print(f"Final k-effective: {k_Nuscale_all_bot:.6f}")
 # A1_NuScale_eq, A2_NuScale_eq, B1_fast_fission_NuScale_eq, B1_thermal_fission_NuScale_eq, B2_NuScale_eq = matrix(
-#     core_NuScale_eq, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim
+#     core_NuScale_all_bot, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim
 # )
 
-# core_checker_1800 = CoreBuilder.core_maker("core_map_checker_1800") # checkered 4.05 and 4.55
-# A1_checker_1800, A2_checker_1800, B1_fast_fission_checker_1800, B1_thermal_fission_checker_1800, B2_checker_1800 = matrix(
-#     grand_xs_library, core_checker_1800, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim
+# core_checker_all_bot = CoreBuilder.core_maker("core_map_checker_all_bot") # checkered 4.05 and 4.55
+# A1_checker_all_bot, A2_checker_all_bot, B1_fast_fission_checker_all_bot, B1_thermal_fission_checker_all_bot, B2_checker_all_bot = matrix(
+#     grand_xs_library, core_checker_all_bot, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim
 # )
-# k_checker_1800, flux1_checker_1800, flux2_checker_1800 = fluxsearch(
-#     A1_checker_1800, A2_checker_1800, B1_fast_fission_checker_1800, B1_thermal_fission_checker_1800, B2_checker_1800
+# k_checker_all_bot, flux1_checker_all_bot, flux2_checker_all_bot = fluxsearch(
+#     A1_checker_all_bot, A2_checker_all_bot, B1_fast_fission_checker_all_bot, B1_thermal_fission_checker_all_bot, B2_checker_all_bot
 # )
-# print(f"Final k-effective: {k_checker_1800:.6f}")
+# print(f"Final k-effective: {k_checker_all_bot:.6f}")
 
+normalize_and_plot(
+    flux1_Nuscale_all_bot, flux2_Nuscale_all_bot, core_NuScale_all_bot,
+    power_MW=thermal_power,               # reactor thermal power
+    assembly_dim_cm=assembly_ij_dim,         # XY dimension per assembly
+    fuel_height_cm=fuel_k_dim          # axial height of fuel
+)
 # k_NuScale_eq, flux1_NuScale_eq, flux2_NuScale_eq = fluxsearch(
 #     A1_NuScale_eq, A2_NuScale_eq, B1_fast_fission_NuScale_eq, B1_thermal_fission_NuScale_eq, B2_NuScale_eq
 # )
@@ -776,6 +784,7 @@ core_NuScale_eq = CoreBuilder.core_maker("core_map_NuScale_eq") # NuScale design
 #         flux2_file.write(f"{flux}\n")
 
 # # === Run plot routine ===
+core_NuScale_eq = CoreBuilder.core_maker("core_map_NuScale_eq") # NuScale design at 1800 ppm
 with open("flux1_NuScale_eq.txt", 'r') as flux1_file:
     lines = flux1_file.readlines()
     flux1_NuScale_eq = np.array([float(line.strip()) for line in lines])
