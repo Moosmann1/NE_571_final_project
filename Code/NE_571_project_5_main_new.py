@@ -684,16 +684,16 @@ thermal_power = 160       # MWt https://www.nrc.gov/docs/ML2022/ML20224A492.pdf
 #     fuel_height_cm=200          # axial height of fuel
 # )
 
-core_checker = CoreBuilder.core_maker("core_map_checker") # checkered 4.05 and 4.55
+# core_checker = CoreBuilder.core_maker("core_map_checker") # checkered 4.05 and 4.55
 
-A1_checker, A2_checker, B1_fast_fission_checker, B1_thermal_fission_checker, B2_checker = matrix(
-    grand_xs_library, core_checker, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim
-)
+# A1_checker, A2_checker, B1_fast_fission_checker, B1_thermal_fission_checker, B2_checker = matrix(
+#     grand_xs_library, core_checker, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim
+# )
 
-k_checker, flux1_checker, flux2_checker = fluxsearch(
-    A1_checker, A2_checker, B1_fast_fission_checker, B1_thermal_fission_checker, B2_checker
-)
-print(f"Final k-effective: {k_checker:.6f}")
+# k_checker, flux1_checker, flux2_checker = fluxsearch(
+#     A1_checker, A2_checker, B1_fast_fission_checker, B1_thermal_fission_checker, B2_checker
+# )
+# print(f"Final k-effective: {k_checker:.6f}")
 # with open("flux1_checker.txt", 'w') as flux1_file:
 #     for flux in flux1_checker:
 #         flux1_file.write(f"{flux}\n")
@@ -787,18 +787,19 @@ core_map_NuScale_eq = [
 #     for flux in flux2_crit:
 #         flux2_file.write(f"{flux}\n")
         
-# # === Run plot routine ===
-# with open("flux1_crit.txt", 'r') as flux1_file:
-#     lines = flux1_file.readlines()
-#     flux1_crit = np.array([float(line.strip()) for line in lines])
-# with open("flux2_crit.txt", 'r') as flux2_file:
-#     lines = flux2_file.readlines()
-#     flux2_crit = np.array([float(line.strip()) for line in lines])
+# === Run plot routine ===
+with open("flux1_crit.txt", 'r') as flux1_file:
+    lines = flux1_file.readlines()
+    flux1_crit = np.array([float(line.strip()) for line in lines])
+with open("flux2_crit.txt", 'r') as flux2_file:
+    lines = flux2_file.readlines()
+    flux2_crit = np.array([float(line.strip()) for line in lines])
 
-# core_NuScale_crit = CoreBuilder.core_maker("core_map_NuScale_eq_crit_search")
-# normalize_and_plot(
-#     flux1_crit, flux2_crit, core_NuScale_crit,
-#     power_MW=thermal_power,               # reactor thermal power
-#     assembly_dim_cm=assembly_ij_dim,         # XY dimension per assembly
-#     fuel_height_cm=fuel_k_dim          # axial height of fuel
-# )
+interp_cx_for_graph = interpolate_xs(grand_xs_library, 758.984375)
+core_NuScale_crit = CoreBuilder.core_maker("core_map_NuScale_eq_crit_search")
+normalize_and_plot(
+    flux1_crit, flux2_crit, core_NuScale_crit,
+    power_MW=thermal_power,               # reactor thermal power
+    assembly_dim_cm=assembly_ij_dim,         # XY dimension per assembly
+    fuel_height_cm=fuel_k_dim          # axial height of fuel
+)
