@@ -509,7 +509,7 @@ def normalize_and_plot(flux1, flux2, core_map, power_MW, assembly_dim_cm, fuel_h
     plt.tight_layout()
     plt.show()
     
-def bisection_boron(core_name, assembly_map, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim, thermal_power, tol=1e-5, max_iter=100):
+def bisection_boron(core_name, assembly_map, assembly_ij_dim, fuel_k_dim, bottom_ref_k_dim, top_ref_k_dim, boron_low=600, boron_high=1800, tol=1e-5, max_iter=100):
     """
     Perform bisection to adjust boron concentration to achieve critical k_eff (k_eff ≈ 1.0).
 
@@ -528,9 +528,7 @@ def bisection_boron(core_name, assembly_map, assembly_ij_dim, fuel_k_dim, bottom
         float: Critical boron concentration.
         float: Final k_eff value.
     """
-    # Initial boron bounds
-    boron_low = 700  # ppm
-    boron_high = 800  # ppm (example upper bound)
+
     boron_critical = None
 
     # Initialize CoreBuilder
@@ -766,6 +764,18 @@ core_map_NuScale_eq = [
     ['rad', 0], ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],         ['rad', 0],
 ] 
 
+core_map_checker = [
+    ['rad', 0], ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],
+    ['rad', 0], ['rad', 0],        ['rad', 0],        ['NUu405c00', 0],  ['NUu455c50', 0],  ['NUu405c00', 0],  ['rad', 0],        ['rad', 0],        ['rad', 0],
+    ['rad', 0], ['rad', 0],        ['NUu405c00', 0],  ['NUu455c50', 0],  ['NUu405c00', 0],  ['NUu455c50', 0],  ['NUu405c00', 0],  ['rad', 0],        ['rad', 0],
+    ['rad', 0], ['NUu405c00', 0],  ['NUu455c50', 0],  ['NUu405c00', 0],  ['NUu455c50', 0],  ['NUu405c00', 0],  ['NUu455c50', 0],  ['NUu405c00', 0],  ['rad', 0],
+    ['rad', 0], ['NUu455c50', 0],  ['NUu405c00', 0],  ['NUu455c50', 0],  ['NUu405c00', 0],  ['NUu455c50', 0],  ['NUu405c00', 0],  ['NUu455c50', 0],  ['rad', 0],
+    ['rad', 0], ['NUu405c00', 0],  ['NUu455c50', 0],  ['NUu405c00', 0],  ['NUu455c50', 0],  ['NUu405c00', 0],  ['NUu455c50', 0],  ['NUu405c00', 0],  ['rad', 0],
+    ['rad', 0], ['rad', 0],        ['NUu405c00', 0],  ['NUu455c50', 0],  ['NUu405c00', 0],  ['NUu455c50', 0],  ['NUu405c00', 0],  ['rad', 0],        ['rad', 0],
+    ['rad', 0], ['rad', 0],        ['rad', 0],        ['NUu405c00', 0],  ['NUu455c50', 0],  ['NUu405c00', 0],  ['rad', 0],        ['rad', 0],        ['rad', 0],
+    ['rad', 0], ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],        ['rad', 0],
+]
+
 # === Bisection to find critical boron concentration ===
 # time_start = time.time()
 # boron_critical, k_eff, flux1_crit, flux2_crit = bisection_boron(
@@ -775,7 +785,8 @@ core_map_NuScale_eq = [
 #     fuel_k_dim=fuel_k_dim,
 #     bottom_ref_k_dim=bottom_ref_k_dim,
 #     top_ref_k_dim=top_ref_k_dim,
-#     thermal_power=thermal_power
+#     boron_low=700,
+#     boron_high=800,
 # )
 # time_end = time.time()
 # print(f"Time taken for crit search: {time_end - time_start:.2f} seconds")
@@ -786,19 +797,41 @@ core_map_NuScale_eq = [
 # with open("flux2_crit.txt", 'w') as flux2_file:
 #     for flux in flux2_crit:
 #         flux2_file.write(f"{flux}\n")
+
+# == Bisection to find critical boron concentration for checkered design ===
+time_start = time.time()
+boron_critical, k_eff, flux1_crit, flux2_crit = bisection_boron(
+    core_name="core_map_checker_crit_search",
+    assembly_map=core_map_checker,
+    assembly_ij_dim=assembly_ij_dim,
+    fuel_k_dim=fuel_k_dim,
+    bottom_ref_k_dim=bottom_ref_k_dim,
+    top_ref_k_dim=top_ref_k_dim,
+)
+time_end = time.time()
+print(f"Time taken for crit search: {time_end - time_start:.2f} seconds")
+
+with open("flux1_checker_crit.txt", 'w') as flux1_file:
+    for flux in flux1_crit:
+        flux1_file.write(f"{flux}\n")
+with open("flux2_checker_crit.txt", 'w') as flux2_file:
+    for flux in flux2_crit:
+        flux2_file.write(f"{flux}\n")
+
         
 # === Run plot routine ===
-with open("flux1_crit.txt", 'r') as flux1_file:
+with open("flux1_checker_crit.txt", 'r') as flux1_file:
     lines = flux1_file.readlines()
     flux1_crit = np.array([float(line.strip()) for line in lines])
-with open("flux2_crit.txt", 'r') as flux2_file:
+with open("flux2_checker_crit.txt", 'r') as flux2_file:
     lines = flux2_file.readlines()
     flux2_crit = np.array([float(line.strip()) for line in lines])
 
-interp_cx_for_graph = interpolate_xs(grand_xs_library, 758.984375)
-core_NuScale_crit = CoreBuilder.core_maker("core_map_NuScale_eq_crit_search")
+# interp_cx_for_graph = interpolate_xs(grand_xs_library, 758.984375)
+# core_NuScale_crit = CoreBuilder.core_maker("core_map_NuScale_eq_crit_search")
+core_checker_crit = CoreBuilder.core_maker("core_map_checker_crit_search")
 normalize_and_plot(
-    flux1_crit, flux2_crit, core_NuScale_crit,
+    flux1_crit, flux2_crit, core_checker_crit,
     power_MW=thermal_power,               # reactor thermal power
     assembly_dim_cm=assembly_ij_dim,         # XY dimension per assembly
     fuel_height_cm=fuel_k_dim          # axial height of fuel
